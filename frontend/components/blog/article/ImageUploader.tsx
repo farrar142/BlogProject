@@ -1,6 +1,6 @@
-import { Box, Button, LinearProgress, Tabs, Typography } from '@mui/material';
-import axios, { AxiosResponse } from 'axios';
-import Image from 'next/image';
+import { Box, Button, LinearProgress, Tabs, Typography } from "@mui/material";
+import axios, { AxiosResponse } from "axios";
+import Image from "next/image";
 import {
   ChangeEvent,
   forwardRef,
@@ -9,11 +9,10 @@ import {
   useEffect,
   useRef,
   useState,
-} from 'react';
-import { S3BUCKET } from '../../../src/global';
-import { UserInfo } from '../../../types/accounts';
-import { useSysMsg } from '../../MySnackBar';
-import video from '../../video';
+} from "react";
+import { S3BUCKET } from "../../../src/global";
+import { UserInfo } from "../../../types/accounts";
+import { useSysMsg } from "../../MySnackBar";
 export interface imageUploaderProps {
   userId: number;
   setImages?: (images: Array<MyImageType>) => void;
@@ -50,7 +49,7 @@ const MyImageUploader = (props: imageUploaderProps) => {
   const uploadHandler = useCallback(
     async (e: ChangeEvent<HTMLInputElement> | any) => {
       let el: File[] = [];
-      if (e.type === 'drop') {
+      if (e.type === "drop") {
         // 드래그 앤 드롭 했을때
         el = e.dataTransfer.files;
       } else {
@@ -59,7 +58,7 @@ const MyImageUploader = (props: imageUploaderProps) => {
       }
       // const el = e.currentTarget.files;
       const fileList = await FilesToMyType(el, props.userId, setProgress);
-      console.log('fileList', fileList);
+      console.log("fileList", fileList);
       setImages([...images, ...fileList].filter((res, idx) => idx < maxNumber));
       if (images.length < dpImage + 1) {
         setDpImage(0);
@@ -103,10 +102,10 @@ const MyImageUploader = (props: imageUploaderProps) => {
     // 앞서 말했던 4개의 이벤트에 Listener를 등록합니다. (마운트 될때)
 
     if (dragRef.current !== null) {
-      dragRef.current.addEventListener('dragenter', handleDragIn);
-      dragRef.current.addEventListener('dragleave', handleDragOut);
-      dragRef.current.addEventListener('dragover', handleDragOver);
-      dragRef.current.addEventListener('drop', handleDrop);
+      dragRef.current.addEventListener("dragenter", handleDragIn);
+      dragRef.current.addEventListener("dragleave", handleDragOut);
+      dragRef.current.addEventListener("dragover", handleDragOver);
+      dragRef.current.addEventListener("drop", handleDrop);
     }
   }, [handleDragIn, handleDragOut, handleDragOver, handleDrop]);
 
@@ -114,10 +113,10 @@ const MyImageUploader = (props: imageUploaderProps) => {
     // 앞서 말했던 4개의 이벤트에 Listener를 삭제합니다. (언마운트 될때)
 
     if (dragRef.current !== null) {
-      dragRef.current.removeEventListener('dragenter', handleDragIn);
-      dragRef.current.removeEventListener('dragleave', handleDragOut);
-      dragRef.current.removeEventListener('dragover', handleDragOver);
-      dragRef.current.removeEventListener('drop', handleDrop);
+      dragRef.current.removeEventListener("dragenter", handleDragIn);
+      dragRef.current.removeEventListener("dragleave", handleDragOut);
+      dragRef.current.removeEventListener("dragover", handleDragOver);
+      dragRef.current.removeEventListener("drop", handleDrop);
     }
   }, [handleDragIn, handleDragOut, handleDragOver, handleDrop]);
 
@@ -128,7 +127,7 @@ const MyImageUploader = (props: imageUploaderProps) => {
   }, [initDragEvents, resetDragEvents]);
   useEffect(() => {
     if (progress == 1) {
-      setMsg({ type: 'success', message: '업로드가 완료되었습니다.' });
+      setMsg({ type: "success", message: "업로드가 완료되었습니다." });
       const timeout = setTimeout(() => {
         setProgress(0);
       }, 1000);
@@ -142,8 +141,8 @@ const MyImageUploader = (props: imageUploaderProps) => {
     index: number,
     setProgress: (e: number) => void
   ) => {
-    const fileEl: HTMLInputElement = window.document.createElement('input');
-    fileEl.type = 'file';
+    const fileEl: HTMLInputElement = window.document.createElement("input");
+    fileEl.type = "file";
     fileEl.click();
     fileEl.onchange = async (e: Event | any) => {
       const _fileRef = e.target;
@@ -189,25 +188,25 @@ const MyImageUploader = (props: imageUploaderProps) => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
       }}
     >
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          flexDirection: 'row',
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          flexDirection: "row",
         }}
       >
-        <Box sx={{ width: '100%' }}>
-          <LinearProgress variant='determinate' value={progress * 100} />
+        <Box sx={{ width: "100%" }}>
+          <LinearProgress variant="determinate" value={progress * 100} />
         </Box>
         <Box sx={{ minWidth: 35, marginLeft: 1 }}>
-          <Typography variant='body2' color='text.secondary'>{`${Math.round(
+          <Typography variant="body2" color="text.secondary">{`${Math.round(
             progress * 100
           )}%`}</Typography>
         </Box>
@@ -215,9 +214,9 @@ const MyImageUploader = (props: imageUploaderProps) => {
       <Tabs
         value={value}
         // onChange={handleChange}
-        variant='scrollable'
-        scrollButtons='auto'
-        sx={{ width: '100%' }}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ width: "100%" }}
       >
         {images.map((image, index) => {
           return (
@@ -238,23 +237,23 @@ const MyImageUploader = (props: imageUploaderProps) => {
         })}
       </Tabs>
       {images.length < max ? (
-        <Button component='label'>
+        <Button component="label">
           <input
             hidden
             onChange={(e) => uploadHandler(e)}
-            id='fileUpload'
+            id="fileUpload"
             multiple
-            type='file'
-            accept='image/gif,image/jpeg,image/png,video/mp4'
+            type="file"
+            accept="image/gif,image/jpeg,image/png,video/mp4"
             // style={{ display: "none" }} // label을 이용하여 구현하기에 없애줌
           />
           <label
-            className={isDragging ? 'DragDrop-File-Dragging' : 'DragDrop-File'}
+            className={isDragging ? "DragDrop-File-Dragging" : "DragDrop-File"}
             // 드래그 중일때와 아닐때의 클래스 이름을 다르게 주어 스타일 차이
 
-            htmlFor='fileUpload'
+            htmlFor="fileUpload"
             ref={dragRef}
-            style={{ width: '100%', height: '100%', cursor: 'pointer' }}
+            style={{ width: "100%", height: "100%", cursor: "pointer" }}
           >
             <div>upload</div>
           </label>
@@ -271,7 +270,7 @@ export default MyImageUploader;
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 interface ImageViewProps {
@@ -286,23 +285,23 @@ const ImageView = (props: ImageViewProps) => {
   const { image, index, admin, onImageUpdate, onImageRemove, handleChange } =
     props;
   const [msg, setMsg] = useSysMsg();
-  const shortenedUrl = image.dataURL.replace(S3BUCKET, '');
+  const shortenedUrl = image.dataURL.replace(S3BUCKET, "");
   return (
-    <Box sx={{ width: '100px' }}>
-      {image.type == 'image' ? (
+    <Box sx={{ width: "100px" }}>
+      {image.type == "image" ? (
         <Image
-          src={image.dataURL ? image.dataURL : ''}
-          alt=''
+          src={image.dataURL ? image.dataURL : ""}
+          alt=""
           width={100}
           height={100}
           onClick={() => {
             navigator.clipboard.writeText(`![이미지](${shortenedUrl})`);
-            setMsg({ type: 'success', message: '이미지가 복사되었습니다' });
+            setMsg({ type: "success", message: "이미지가 복사되었습니다" });
           }}
           onMouseOver={(e) => handleChange(e, index)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         />
-      ) : image.type == 'video' ? (
+      ) : image.type == "video" ? (
         <video
           controls
           src={image.dataURL}
@@ -313,10 +312,10 @@ const ImageView = (props: ImageViewProps) => {
             navigator.clipboard.writeText(
               `<video controls autoplay src="${shortenedUrl}"/>`
             );
-            setMsg({ type: 'success', message: '이미지가 복사되었습니다' });
+            setMsg({ type: "success", message: "이미지가 복사되었습니다" });
           }}
           onMouseOver={(e) => handleChange(e, index)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         />
       ) : (
         <Box
@@ -324,32 +323,32 @@ const ImageView = (props: ImageViewProps) => {
           height={100}
           onClick={() => {
             navigator.clipboard.writeText(`[다운로드](${shortenedUrl})`);
-            setMsg({ type: 'success', message: '파일이 복사되었습니다' });
+            setMsg({ type: "success", message: "파일이 복사되었습니다" });
           }}
           onMouseOver={(e) => handleChange(e, index)}
           sx={{
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          {image.dataURL.split('/').reverse()[0]}
+          {image.dataURL.split("/").reverse()[0]}
         </Box>
       )}
       {admin ? (
         <Box>
           <Button
-            sx={{ minWidth: '50px' }}
+            sx={{ minWidth: "50px" }}
             onClick={() => onImageUpdate(index)}
-            size='small'
+            size="small"
           >
             수정
           </Button>
           <Button
-            sx={{ minWidth: '50px' }}
+            sx={{ minWidth: "50px" }}
             onClick={() => onImageRemove(index)}
-            size='small'
+            size="small"
           >
             삭제
           </Button>
@@ -363,7 +362,7 @@ const Bar = forwardRef((props: any, ref: any) => (
     {props.children}
   </span>
 ));
-Bar.displayName = 'Bar';
+Bar.displayName = "Bar";
 export type ImageFromRequest = {
   url: string;
   id: number;
@@ -376,14 +375,14 @@ export interface MyImageType {
   id: number;
   dataURL: string;
   size: Size;
-  type: 'image' | 'video' | any;
+  type: "image" | "video" | any;
   object_id?: number;
 }
 
 export async function getSizeWithUrl(
   url: string
-): Promise<Omit<MyImageType, 'id'>> {
-  const _image: HTMLImageElement = document.createElement('img');
+): Promise<Omit<MyImageType, "id">> {
+  const _image: HTMLImageElement = document.createElement("img");
   console.log(url);
   return new Promise((resolve, reject) => {
     let size = {
@@ -391,18 +390,18 @@ export async function getSizeWithUrl(
       height: 1,
     };
     if (url) {
-      console.log('이미지구하는중');
+      console.log("이미지구하는중");
       _image.src = url;
       _image.onload = () => {
         size = {
           width: _image.width != 0 ? _image.width : 1,
           height: _image.height != 0 ? _image.height : 1,
         };
-        console.log('이미지 크기 구함');
-        resolve({ dataURL: url, size, type: 'image' });
+        console.log("이미지 크기 구함");
+        resolve({ dataURL: url, size, type: "image" });
       };
     } else {
-      resolve({ dataURL: url, size, type: 'image' });
+      resolve({ dataURL: url, size, type: "image" });
     }
   });
 }
@@ -414,16 +413,16 @@ export const uploadImageByFiles = async (
 ): Promise<ImageFromRequest[]> => {
   let media_urls: ImageFromRequest[] = [];
   const formData = new FormData();
-  formData.append('origin', 'blog');
-  formData.append('user', userId.toString());
+  formData.append("origin", "blog");
+  formData.append("user", userId.toString());
   for (let i = 0; i < files.length; i++) {
     const _file = files[i];
     if (_file != undefined) {
       formData.append(`files`, _file);
     }
   }
-  const url = '/mediaserver/upload/files';
-  const method = 'post';
+  const url = "/mediaserver/upload/files";
+  const method = "post";
   await axios
     .request<any, AxiosResponse<{ files: { url: string; id: number }[] }>>({
       url,
@@ -437,7 +436,7 @@ export const uploadImageByFiles = async (
         ...files,
         url: sanitizeUrl(files.url),
       }));
-      console.log('mediaurls', media_urls);
+      console.log("mediaurls", media_urls);
     });
   return media_urls;
 };
@@ -463,20 +462,20 @@ export const FilesToMyType = async (
   if (el && el.length >= 1) {
     const files = await uploadImageByFiles(el, userId, setProgress);
     for (let item = 0; item < el.length; item++) {
-      const fileType = el[item].type.split('/')[0];
-      if (fileType == 'image') {
+      const fileType = el[item].type.split("/")[0];
+      if (fileType == "image") {
         const fileType = await getSizeWithUrl(files[item].url);
         fileList.push({
           ...fileType,
           id: files[item].id,
           dataURL: files[item].url,
         });
-      } else if (fileType == 'video') {
+      } else if (fileType == "video") {
         fileList.push({
           id: files[item].id,
           dataURL: files[item].url,
           size: { width: 10, height: 10 },
-          type: 'video',
+          type: "video",
         });
       } else {
         fileList.push({
@@ -492,9 +491,9 @@ export const FilesToMyType = async (
 };
 
 const sanitizeUrl = (url: string) => {
-  if (url.startsWith('/')) {
+  if (url.startsWith("/")) {
     return url;
   } else {
-    return '/' + url;
+    return "/" + url;
   }
 };
