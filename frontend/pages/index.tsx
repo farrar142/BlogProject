@@ -1,20 +1,20 @@
-import { Button, Container } from '@mui/material';
-import axios from 'axios';
-import type { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
-import API from '../api';
-import { ArticlesRenderer } from '../components/blog/ArticleRenderer';
-import { MainTagRenderer } from '../components/blog/TagRenderer';
-import { useTestSelector, useUserInfo } from '../src/atoms';
-import { API_BASE } from '../src/global';
-import { ArticlesType, ArticleType, Tags } from '../types/blog/blogTags';
+import { Button, Container } from "@mui/material";
+import axios from "axios";
+import type { GetServerSideProps } from "next";
+import { useEffect, useState } from "react";
+import API from "../api";
+import { ArticlesRenderer } from "../components/blog/ArticleRenderer";
+import { MainTagRenderer } from "../components/blog/TagRenderer";
+import { useUserInfo } from "../src/atoms";
+import { API_BASE } from "../src/global";
+import { ArticlesType, ArticleType, Tags } from "../types/blog/blogTags";
 const Home = (props: { tags: Tags }) => {
   const { tags } = props;
   const [articles, setArticles] = useState<ArticleType[]>([]);
   const [userinfo, setuserinfo] = useUserInfo();
   console.log(userinfo);
   useEffect(() => {
-    API.Article.getArticleByBlog('random', {}).then(({ data }) => {
+    API.Article.getArticleByBlog("random", {}).then(({ data }) => {
       setArticles(data.results);
     });
   }, []);
