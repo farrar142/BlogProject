@@ -14,7 +14,7 @@ client.interceptors.request.use(async (config: AxiosRequestConfig) => {
   try {
     const token = getCookie('token');
     console.log(token);
-    config.headers['Authorization'] = `Bearer ${token}`;
+    // config.headers['Authorization'] = `Bearer ${token}`;
   } catch (e) {
     //
   }
