@@ -5,6 +5,6 @@ COPY . .
 # RUN apt-get update -y && apt-get install nginx -y 
 # RUN service nginx restart
 RUN npm install
-RUN npm build
+RUN npm run build
 EXPOSE 3000
 # CMD npm start
