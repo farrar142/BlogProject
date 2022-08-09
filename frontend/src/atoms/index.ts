@@ -79,24 +79,6 @@ export const useUserInfo = (): [UserInfo, (e: UserInfo) => void] => {
   return [getter, setter];
 };
 
-const testAtom = atom({
-  key: "testAtom",
-  default: "what i have to do",
-});
-const testSelector = selector({
-  key: "testSelector",
-  get: async ({ get }) => testStorage(get(testAtom)),
-  set: async ({ set }, newValue) => {
-    set(testAtom, newValue);
-  },
-});
-
-export const useTestSelector = () => {
-  const [getter, _setter] = useRecoilState(testSelector);
-  const [_getter, setter] = useRecoilState(testAtom);
-  return [getter, setter];
-};
-
 export const useSsrComplectedState = (): boolean => {
   const [ssrCompleted, setSsrCompleted] =
     useRecoilState<boolean>(ssrCompletedState);
