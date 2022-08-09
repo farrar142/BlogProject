@@ -13,3 +13,4 @@ django-inlinecss
 
 celery==5.2.3
 redis
+gunicorn
