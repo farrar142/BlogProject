@@ -31,26 +31,28 @@ import {
   lightTheme,
   lightTheme as theme,
 } from "../../styles/theme/lightThemeOptions";
-import { LsType } from "../../pages/cli";
+import { LsFile, LsType } from "../../pages/cli";
 type DirectoriesType = {
   children: ReactNode;
-  rmRf: (path: string, target: string, type: LsType) => void;
+  rmRF: (path: string, target: string, type: LsType) => void;
   pasteName: (pathName: string, fileName: string) => void;
   changeDir: (path: string, target: string) => void;
-  searchKw: string;
+  searchKW: string;
   infoPathOpen: boolean;
   catDir: (path: string, target: string) => void;
+  files: LsFile[];
+  path: string;
 };
-export const Directories = (props) => {
-  const {
-    children,
-    rmRF,
-    pasteName,
-    changeDir,
-    catDir,
-    infoPathOpen,
-    searchKW,
-  } = props;
+export const Directories: React.FC<DirectoriesType> = ({
+  children,
+  rmRF,
+  pasteName,
+  changeDir,
+  catDir,
+  infoPathOpen,
+  searchKW,
+  ...props
+}) => {
   const [isDark, setDark] = useDarkMode();
   const theme = isDark ? darkTheme : lightTheme;
   const [curFiles, setCurFiles] = useState(props.files);
@@ -116,11 +118,21 @@ export const Directories = (props) => {
   );
 };
 
-const DisplayDirIcon = (props) => {
+type DisplayDirIconProps = {
+  idx: number;
+  path: string;
+  item: LsFile;
+  rmRF: (path: string, target: string, type: LsType) => void;
+  pasteName: (pathName: string, fileName: string) => void;
+  changeDir: (path: string, target: string) => void;
+  catDir: (path: string, target: string) => void;
+};
+
+const DisplayDirIcon: React.FC<DisplayDirIconProps> = (props) => {
   const { path, item, idx, rmRF, pasteName, catDir, changeDir } = props;
   const name = item[1] == ".." ? "상위폴더" : item[1];
   const [subMenuOpen, setSubOpen] = useState(false);
-  const m_styles = styles(theme);
+  const m_styles = styles();
   const remove = () => {
     if (item[1] != "..") {
       return (
@@ -171,11 +183,30 @@ const DisplayDirIcon = (props) => {
     </Card>
   );
 };
-const DisplayFileIcon = (props) => {
-  const { path, item, idx, rmRF, pasteName, catDir, changeDir } = props;
+
+type DisplayDirFileProps = {
+  idx: number;
+  path: string;
+  item: LsFile;
+  rmRF: (path: string, target: string, type: LsType) => void;
+  pasteName: (pathName: string, fileName: string) => void;
+  changeDir: (path: string, target: string) => void;
+  catDir: (path: string, target: string) => void;
+};
+
+const DisplayFileIcon: React.FC<DisplayDirFileProps> = ({
+  path,
+  item,
+  idx,
+  rmRF,
+  pasteName,
+  catDir,
+  changeDir,
+  ...props
+}) => {
   const [subMenuOpen, setSubOpen] = useState(false);
   const name = item[1];
-  const m_styles = styles(theme);
+  const m_styles = styles();
   return (
     <Card
       sx={m_styles.fileStyle}
@@ -218,11 +249,6 @@ const DisplayFileIcon = (props) => {
   );
 };
 
-function dirsPropsAreEqual(prevDir, nextDir) {
-  return (
-    prevDir.searchKW === nextDir.searchKW && prevDir.files === nextDir.files
-  );
-}
 const styles = () => {
   return {
     controller: {
@@ -236,7 +262,7 @@ const styles = () => {
       paddingLeft: "auto",
       margin: "0 10px",
     },
-    infoCon: (check) => {
+    infoCon: (check: boolean) => {
       return {
         "& .MuiTextField-root": { m: 1, width: "25ch" },
         maxWidth: "1200px",
@@ -305,9 +331,8 @@ const styles = () => {
     viwerCon: {
       width: "50%",
     },
-    dirCon: (check) => {
+    dirCon: (check: boolean) => {
       return {
-        display: "block",
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-around",
@@ -335,12 +360,12 @@ const styles = () => {
       cursor: "pointer",
     },
     action: {},
-    mainMenu: (check) => {
+    mainMenu: (check: boolean) => {
       return {
         display: check ? "none" : "block",
       };
     },
-    subMenu: (check) => {
+    subMenu: (check: boolean): React.CSSProperties => {
       return {
         height: "100%",
         // cursor: "pointer",
@@ -348,7 +373,7 @@ const styles = () => {
         // display: check ? "block" : "none",
       };
     },
-    infoPathCon: (check) => {
+    infoPathCon: (check: boolean) => {
       return {
         display: { xs: check ? "none" : "flex", md: "flex" },
       };

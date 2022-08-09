@@ -12,7 +12,7 @@ import {
   Autocomplete,
   Slider,
   Theme,
-} from '@mui/material';
+} from "@mui/material";
 import {
   ChangeEvent,
   createRef,
@@ -20,15 +20,15 @@ import {
   useEffect,
   useRef,
   useState,
-} from 'react';
-import axios from 'axios';
-import { NextPage } from 'next';
-import { useSysMsg } from '../components/MySnackBar';
-import { useConfig } from '../src/storage';
-import { darkTheme, lightTheme } from '../styles/theme/lightThemeOptions';
-import { CatViewer } from '../components/cli/CatViewer';
-import { Directories } from '../components/cli/Directories';
-import { useDarkMode } from '../src/atoms';
+} from "react";
+import axios from "axios";
+import { NextPage } from "next";
+import { useSysMsg } from "../components/MySnackBar";
+import { useConfig } from "../src/storage";
+import { darkTheme, lightTheme } from "../styles/theme/lightThemeOptions";
+import { CatViewer } from "../components/cli/CatViewer";
+import { Directories } from "../components/cli/Directories";
+import { useDarkMode } from "../src/atoms";
 function cmdFactory(command: string, value: string): CMD {
   return { label: command, id: value };
 }
@@ -36,8 +36,9 @@ export type CMD = {
   label: string;
   id: string;
 };
-export type LsType = 'file' | 'dir';
+export type LsType = "file" | "dir";
 export type InputEv = ChangeEvent<HTMLInputElement>;
+export type LsFile = [LsType, string];
 type CliConfig = {
   hostname: string;
   username: string;
@@ -47,12 +48,12 @@ type CliConfig = {
   port: number;
 };
 const cliGet = async (config: CliConfig) => {
-  const url = '/cliserver/get';
+  const url = "/cliserver/get";
   return new Promise((resolve, reject) => {
     axios
       .request({
         url,
-        method: 'post',
+        method: "post",
         headers: {},
         data: config,
         onDownloadProgress: (e) => {
@@ -78,14 +79,14 @@ const CliComp: NextPage = () => {
     setCmd,
   } = useConfig();
   const { path, hostname, user, port, password, cmd } = getter;
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [token, setToken] = useState();
-  const [files, setFiles] = useState([]);
-  const [sourceFile, setSourceFile] = useState('');
-  const [cliResult, setContext] = useState('');
-  const [edit, setEdit] = useState('');
+  const [files, setFiles] = useState<LsFile[]>([]);
+  const [sourceFile, setSourceFile] = useState("");
+  const [cliResult, setContext] = useState("");
+  const [edit, setEdit] = useState("");
   const [action, setAction] = useState(false);
-  const [searchKW, setKW] = useState('');
+  const [searchKW, setKW] = useState("");
   const [msg, _setMsg] = useSysMsg();
   const [viewerWidth, setViewerWidth] = useState(200);
   const [pathHistories, setPathHistories] = useState<string[]>([]);
@@ -97,7 +98,7 @@ const CliComp: NextPage = () => {
   const [isDark, setDark] = useDarkMode();
   const styles = mystyles(isDark ? darkTheme : lightTheme);
   const setMsg = (e: string) => {
-    _setMsg({ type: 'success', message: e });
+    _setMsg({ type: "success", message: e });
   };
   function hostnameHandler(e: InputEv) {
     setHostname(e.target.value);
@@ -112,7 +113,7 @@ const CliComp: NextPage = () => {
     setPath(e.target.value);
   }
   function pathHandler(target_path: string) {
-    setSourceFile('');
+    setSourceFile("");
     setPath(target_path);
   }
   function cmdHandler(e: InputEv) {
@@ -135,8 +136,8 @@ const CliComp: NextPage = () => {
       e.preventDefault();
     } catch {}
     try {
-      if (cmd.split(' ')[0] == 'cd') {
-        setMsg('경로 이동은 ui에서만 해주세요.');
+      if (cmd.split(" ")[0] == "cd") {
+        setMsg("경로 이동은 ui에서만 해주세요.");
         return;
       }
     } catch {}
@@ -145,7 +146,7 @@ const CliComp: NextPage = () => {
     //   return;
     // }
     if (!hostname || !user) {
-      setMsg('접속 정보를 입력해주세요');
+      setMsg("접속 정보를 입력해주세요");
       return;
     }
 
@@ -160,8 +161,8 @@ const CliComp: NextPage = () => {
       port: parseInt(port),
     })
       .then((res: any) => {
-        setFiles(res['files']);
-        console.log(res['files']);
+        setFiles(res["files"]);
+        console.log(res["files"]);
         //filtering
         const regexUser = `\\[${user}\\@.*\\]\\#`;
         const regexPath = `\\[${user}\\@.*\\]\\# cd ${path}`;
@@ -169,83 +170,83 @@ const CliComp: NextPage = () => {
         const regexWrapCmd = `${cmd}(.*)`;
         const regexPureCmd = cmd;
         const regexSpace = `(\\s\\r\\n)*[\\s\\r\\n]*`; //시작쪽의 공백제거
-        const regexLast = '(\\r\\n\\s)*';
+        const regexLast = "(\\r\\n\\s)*";
         const regexPurePath = `cd ${path}`;
-        const reUser = new RegExp(regexUser, 'gm');
-        const rePath = new RegExp(regexPath, 'gm');
-        const reCmd = new RegExp(regexCmd, 'gm');
-        const rePure = new RegExp(regexPurePath, 'gm');
-        const rePureCommand = new RegExp(regexPureCmd, 'gm');
-        const reSpace = new RegExp(regexSpace, 'm');
-        const reWrap = new RegExp(regexWrapCmd, 'm');
-        const reLast = new RegExp(regexLast, 'gm');
-        const regexResult = res['result']
-          .replace(rePath, '')
-          .replace(reCmd, '')
-          .replace(reUser, '')
-          .replace(rePure, '')
-          .replace(rePureCommand, '')
-          .replace(reSpace, '')
-          .replace(/\r\n\>\s/gm, '\n')
+        const reUser = new RegExp(regexUser, "gm");
+        const rePath = new RegExp(regexPath, "gm");
+        const reCmd = new RegExp(regexCmd, "gm");
+        const rePure = new RegExp(regexPurePath, "gm");
+        const rePureCommand = new RegExp(regexPureCmd, "gm");
+        const reSpace = new RegExp(regexSpace, "m");
+        const reWrap = new RegExp(regexWrapCmd, "m");
+        const reLast = new RegExp(regexLast, "gm");
+        const regexResult = res["result"]
+          .replace(rePath, "")
+          .replace(reCmd, "")
+          .replace(reUser, "")
+          .replace(rePure, "")
+          .replace(rePureCommand, "")
+          .replace(reSpace, "")
+          .replace(/\r\n\>\s/gm, "\n")
           .trim()
-          .replace(reWrap, '');
+          .replace(reWrap, "");
         // .replace(/(\r\n\s)+$/gm, "");
         // .replace(/\s$/gm, "");
         const resultContext = regexResult;
         // console.log(JSON.stringify(cmd));
         // console.log(JSON.stringify(resultContext));
         setContext(resultContext.trim());
-        if (!cmd.includes('echo -e')) {
-          setEdit('');
+        if (!cmd.includes("echo -e")) {
+          setEdit("");
         }
-        setCmd('');
-        setInputValue('');
+        setCmd("");
+        setInputValue("");
       })
       .catch((res: any) => {
-        setCmd('');
-        setMsg('접속 정보를 다시 확인해주세요');
+        setCmd("");
+        setMsg("접속 정보를 다시 확인해주세요");
       })
       .finally(() => {
         setCursorLoading(false);
       });
   }
   const pathResolver = (path: string, target: string) => {
-    const t1 = path == '/' ? '' : path;
+    const t1 = path == "/" ? "" : path;
     const t2 = target;
-    return t1 + '/' + t2;
+    return t1 + "/" + t2;
   };
   const changeDir = (path: string, target: string) => {
     /// /home/test
-    let t1 = '/';
+    let t1 = "/";
     let t2 = [] as string[];
-    if (target == '.') {
+    if (target == ".") {
       return;
-    } else if (target == '..') {
-      t2 = path.split('/');
+    } else if (target == "..") {
+      t2 = path.split("/");
       t2.pop();
-      t1 = t2.join('/');
+      t1 = t2.join("/");
       if (!t1) {
-        t1 = '/';
+        t1 = "/";
       }
     } else {
       t1 = pathResolver(path, target);
     }
-    setKW('');
+    setKW("");
     setPathHistories([...pathHistories, path]);
     pathHandler(t1);
     setAction(!action);
   };
   const catDir = (path: string, target: string) => {
     const t_file = pathResolver(path, target);
-    setCmd('cat ' + t_file);
-    setEdit(''); //수정중인글 초기화
+    setCmd("cat " + t_file);
+    setEdit(""); //수정중인글 초기화
     setSourceFile(t_file);
     setAction(!action);
   };
   const rmRF = (path: string, target: string, type: LsType) => {
-    const tcmd = type == 'file' ? 'rm -f' : 'rm -rf';
+    const tcmd = type == "file" ? "rm -f" : "rm -rf";
     const command = `${tcmd} ${pathResolver(path, target)}`;
-    if (window.confirm('정말로 삭제하시겠어요?')) {
+    if (window.confirm("정말로 삭제하시겠어요?")) {
       setCmd(command);
       setAction(!action);
       setMsg(`삭제됨 명령어 : ${command}`);
@@ -285,23 +286,23 @@ const CliComp: NextPage = () => {
   const modifyFile = (target: string, content: string) => {
     const reContent = `echo -e "${content.replace(
       /\r\n/gm,
-      '\n'
+      "\n"
     )}" > ${target}`.trim();
     setCmd(reContent);
     setAction(!action);
   };
   const Breads = (props: any) => {
     const paths = props.paths as string;
-    let sum = '';
-    const ftarget = paths.split('/');
+    let sum = "";
+    const ftarget = paths.split("/");
     let target;
     //뒤로가기버튼
     const BackButton = () => {
       return (
-        <Tooltip title='이전 폴더로 돌아갑니다.'>
+        <Tooltip title="이전 폴더로 돌아갑니다.">
           <div
-            key='backToHitories'
-            style={{ cursor: 'pointer' }}
+            key="backToHitories"
+            style={{ cursor: "pointer" }}
             onClick={backToHistories}
           >
             뒤로가기
@@ -309,14 +310,14 @@ const CliComp: NextPage = () => {
         </Tooltip>
       );
     };
-    if (ftarget[0] == '' && ftarget[1] == '') {
+    if (ftarget[0] == "" && ftarget[1] == "") {
       target = (
-        <Tooltip title='최상위 폴더로 이동합니다.'>
+        <Tooltip title="최상위 폴더로 이동합니다.">
           <div
-            key='/'
-            style={{ cursor: 'pointer' }}
+            key="/"
+            style={{ cursor: "pointer" }}
             onClick={() => {
-              moveAction('/');
+              moveAction("/");
             }}
           >
             /
@@ -326,12 +327,12 @@ const CliComp: NextPage = () => {
     } else {
       target = ftarget.map((item) => {
         if (item) {
-          const pathProp = sum + '/' + item;
-          sum = sum + '/' + item;
+          const pathProp = sum + "/" + item;
+          sum = sum + "/" + item;
           return (
             <div
               key={item}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: "pointer" }}
               onClick={() => {
                 moveAction(pathProp);
               }}
@@ -342,10 +343,10 @@ const CliComp: NextPage = () => {
         } else {
           return (
             <div
-              key='/'
-              style={{ cursor: 'pointer' }}
+              key="/"
+              style={{ cursor: "pointer" }}
               onClick={() => {
-                moveAction('/');
+                moveAction("/");
               }}
             >
               /
@@ -355,7 +356,7 @@ const CliComp: NextPage = () => {
       });
     }
     return (
-      <Breadcrumbs sx={styles.breadCon} separator='›' aria-label='breadcrumb'>
+      <Breadcrumbs sx={styles.breadCon} separator="›" aria-label="breadcrumb">
         <BackButton /> {target}
       </Breadcrumbs>
     );
@@ -371,7 +372,7 @@ const CliComp: NextPage = () => {
   const searchKWHandler = (e: string) => {
     setChidrenSearchKw(e);
   };
-  const [childrenSearchKw, setChidrenSearchKw] = useState('');
+  const [childrenSearchKw, setChidrenSearchKw] = useState("");
   useEffect(() => {
     if (!isLoading) {
       handleSubmit(null as any);
@@ -387,7 +388,7 @@ const CliComp: NextPage = () => {
     <Container>
       <Container sx={styles.resultCon}>
         <Paper
-          component='div'
+          component="div"
           sx={styles.respButton}
           onClick={handleSettingOpen}
         >
@@ -396,52 +397,52 @@ const CliComp: NextPage = () => {
       </Container>
       <Container
         ref={formRef}
-        component='form'
+        component="form"
         sx={styles.controller}
         noValidate
-        autoComplete='off'
+        autoComplete="off"
       >
         <Box sx={styles.infoCon(infoSettingOpen)}>
           <TextField
-            size='small'
+            size="small"
             required
             sx={styles.inputBar}
-            id='outlined-required1'
-            label='hostnamename'
-            name='hostnamename'
+            id="outlined-required1"
+            label="hostnamename"
+            name="hostnamename"
             onChange={hostnameHandler}
             value={hostname}
-            placeholder='IP Address'
+            placeholder="IP Address"
           />
           <TextField
-            size='small'
+            size="small"
             required
             sx={styles.inputBar}
-            id='outlined-required2'
-            label='username'
-            name='username'
+            id="outlined-required2"
+            label="username"
+            name="username"
             onChange={userHandler}
             value={user}
-            placeholder='Hostname NAME'
+            placeholder="Hostname NAME"
           />
           <TextField
-            size='small'
+            size="small"
             required
             sx={styles.inputBar}
-            id='outlined-password-input'
-            label='HOSTname PASSWORD'
-            type='password'
-            name='password'
+            id="outlined-password-input"
+            label="HOSTname PASSWORD"
+            type="password"
+            name="password"
             value={password}
             onChange={passwordHandler}
-            autoComplete='current-password'
+            autoComplete="current-password"
           />
           <Container sx={styles.submitCon}>
             <TextField
-              size='small'
+              size="small"
               sx={styles.inputBar}
-              id='outlined-read-only-input'
-              label='HOSTname PATH'
+              id="outlined-read-only-input"
+              label="HOSTname PATH"
               value={path}
               onChange={inputPathHandler}
               // InputProps={{
@@ -449,26 +450,26 @@ const CliComp: NextPage = () => {
               // }}
             />
             <TextField
-              size='small'
+              size="small"
               sx={styles.inputBar}
-              id='outlined-number'
-              name='port'
-              label='Port'
-              type='number'
+              id="outlined-number"
+              name="port"
+              label="Port"
+              type="number"
               value={port}
               onChange={portHandler}
             />
             <Autocomplete
               disablePortal
               options={cmdList}
-              renderInput={(params) => <TextField {...params} label='cmd' />}
-              size='small'
+              renderInput={(params) => <TextField {...params} label="cmd" />}
+              size="small"
               sx={styles.inputBar}
-              id='outlined-search'
+              id="outlined-search"
               // name="command"
               // label="Command"
               // type="text"
-              value={{ id: '', label: inputValue }}
+              value={{ id: "", label: inputValue }}
               isOptionEqualToValue={(option, value) => true}
               // onChange={(e, nV) => {
               //   console.log(nV);
@@ -481,15 +482,15 @@ const CliComp: NextPage = () => {
                 setCmd(nV);
               }}
             />
-            <Tooltip title='서버에 연결합니다.'>
+            <Tooltip title="서버에 연결합니다.">
               <Button
-                type='submit'
+                type="submit"
                 onClick={(e) => {
                   e.preventDefault();
                   cmdListHandler(cmd);
                   handleSubmit(e as any);
                 }}
-                variant='contained'
+                variant="contained"
               >
                 Connect
               </Button>
@@ -498,10 +499,10 @@ const CliComp: NextPage = () => {
         </Box>
       </Container>
       <Box sx={styles.resultCon}>
-        <Paper component='div' sx={styles.respButton} onClick={handlePathOpen}>
+        <Paper component="div" sx={styles.respButton} onClick={handlePathOpen}>
           Path
         </Paper>
-        <Box sx={{ width: '100%', paddingRight: '10px', paddingLeft: '10px' }}>
+        <Box sx={{ width: "100%", paddingRight: "10px", paddingLeft: "10px" }}>
           <Breads paths={path}></Breads>
           <Directories
             files={files}
@@ -514,28 +515,28 @@ const CliComp: NextPage = () => {
             catDir={catDir}
           >
             <Box sx={styles.searchCon}>
-              <Tooltip title='현재 디렉토리의 파일에서 검색합니다.'>
+              <Tooltip title="현재 디렉토리의 파일에서 검색합니다.">
                 <TextField
                   sx={styles.searchBar}
-                  id='outlined-search2'
-                  label='Search'
-                  name='search'
+                  id="outlined-search2"
+                  label="Search"
+                  name="search"
                   onChange={(e) => {
                     setKW(e.target.value);
                     searchKWHandler(e.target.value);
                   }}
                   value={searchKW}
-                  autoComplete='off'
-                  size='small'
+                  autoComplete="off"
+                  size="small"
                 />
               </Tooltip>
-              <Tooltip title='검색어를 초기화합니다.'>
+              <Tooltip title="검색어를 초기화합니다.">
                 <Button
-                  sx={{ width: '65px' }}
-                  variant='contained'
+                  sx={{ width: "65px" }}
+                  variant="contained"
                   onClick={() => {
-                    setKW('');
-                    setChidrenSearchKw('');
+                    setKW("");
+                    setChidrenSearchKw("");
                   }}
                 >
                   Reset
@@ -564,132 +565,132 @@ const CliComp: NextPage = () => {
 const mystyles = (theme: Theme) => {
   return {
     controller: {
-      '& .MuiTextField-root': { m: 1, width: '25ch' },
-      maxWidth: '1200px',
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingLeft: 'auto',
-      margin: '0 10px',
-      marginBottom: '10px',
+      "& .MuiTextField-root": { m: 1, width: "25ch" },
+      maxWidth: "1200px",
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingLeft: "auto",
+      margin: "0 10px",
+      marginBottom: "10px",
     },
     infoCon: (check: boolean) => {
       return {
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-        maxWidth: '1200px',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingLeft: 'auto',
-        margin: '0 auto',
-        display: { xs: check ? 'none' : 'flex', md: 'flex' },
+        "& .MuiTextField-root": { m: 1, width: "25ch" },
+        maxWidth: "1200px",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingLeft: "auto",
+        margin: "0 auto",
+        display: { xs: check ? "none" : "flex", md: "flex" },
       };
     },
     submitCon: {
-      '& .MuiTextField-root': { m: 1, width: '25ch' },
-      maxWidth: '1200px',
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingLeft: 'auto',
-      margin: '0 auto',
+      "& .MuiTextField-root": { m: 1, width: "25ch" },
+      maxWidth: "1200px",
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingLeft: "auto",
+      margin: "0 auto",
     },
     dirUpperCon: {
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
     },
     searchCon: {
-      display: 'flex',
-      flexDirection: 'row',
+      display: "flex",
+      flexDirection: "row",
     },
-    searchBar: { width: '100%' },
+    searchBar: { width: "100%" },
     resetButton: {
-      width: '65px',
+      width: "65px",
     },
     inputBar: {
-      width: '300px',
+      width: "300px",
     },
     respButton: {
       display: {
-        xs: 'block',
-        md: 'none',
+        xs: "block",
+        md: "none",
       },
-      width: '20%',
-      margin: 'auto',
-      textAlign: 'center',
-      marginTop: '10px',
-      marginBottom: '10px',
+      width: "20%",
+      margin: "auto",
+      textAlign: "center",
+      marginTop: "10px",
+      marginBottom: "10px",
     },
     breadCon: {
-      margin: 'auto',
-      padding: '24px',
+      margin: "auto",
+      padding: "24px",
     },
     resultCon: {
-      display: 'flex',
+      display: "flex",
       width: `100%`,
       padding: 0,
       flexDirection: {
-        xs: 'column',
-        md: 'row',
+        xs: "column",
+        md: "row",
       },
     },
     viwerCon: {
-      width: '50%',
+      width: "50%",
     },
     dirCon: (check: boolean) => {
       return {
         // display: "block",
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        alignContent: 'space-around',
-        display: { xs: check ? 'none' : 'block', md: 'block' },
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-around",
+        alignContent: "space-around",
+        display: { xs: check ? "none" : "block", md: "block" },
       };
     },
     fileStyle: {
-      display: 'inline-block',
-      textAlign: 'center',
-      height: '90px',
-      width: '22%',
-      padding: '5px',
-      margin: '3px',
-      '&:hover': {
+      display: "inline-block",
+      textAlign: "center",
+      height: "90px",
+      width: "22%",
+      padding: "5px",
+      margin: "3px",
+      "&:hover": {
         backgroundColor: alpha(theme.palette.secondary.main, 0.25),
       },
     },
     textStyle: {
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
     },
     iconCursor: {
-      cursor: 'pointer',
+      cursor: "pointer",
     },
     action: {},
     mainMenu: (check: boolean) => {
       return {
-        display: check ? 'none' : 'block',
+        display: check ? "none" : "block",
       };
     },
     subMenu: (check: boolean) => {
       return {
-        height: '100%',
+        height: "100%",
         // cursor: "pointer",
-        visibility: check ? 'visible' : 'hidden',
+        visibility: check ? "visible" : "hidden",
         // display: check ? "block" : "none",
       };
     },
     infoPathCon: (check: boolean) => {
       return {
-        display: { xs: check ? 'none' : 'flex', md: 'flex' },
+        display: { xs: check ? "none" : "flex", md: "flex" },
       };
     },
   };
