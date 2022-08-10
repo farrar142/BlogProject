@@ -23,6 +23,6 @@ urlpatterns = [
     # path('accounts/', include('accounts.urls')),
     # path('blog/', include('blog.urls')),
     # path('', views.index, name='index'),
-    path('auth/,',auth.urls),
+    path('auth/',auth.urls),
     path('api/', api.urls),
 ]

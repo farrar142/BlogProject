@@ -1,5 +1,10 @@
+import datetime
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from jose import jwt
+
+from base.settings import SECRET_KEY
 # Create your models here.
 
 class User(AbstractUser):
@@ -17,3 +22,23 @@ class User(AbstractUser):
     )
     email = models.EmailField('이메일')
     profile_url = models.CharField(max_length=256,null=True,blank=True)
+    
+    @classmethod
+    def offer_token(cls,pk):
+        payload = {
+            "id": pk,
+            "exp": datetime.datetime.now()+datetime.timedelta(days=2,hours=-9),
+            'iat': datetime.datetime.now()+datetime.timedelta(hours=-9),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        return token
+    
+    def make_token(self):
+        payload = {
+            "id": self.pk,
+            "exp": datetime.datetime.now()+datetime.timedelta(days=2,hours=-9),
+            'iat': datetime.datetime.now()+datetime.timedelta(hours=-9),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        return token
+        
