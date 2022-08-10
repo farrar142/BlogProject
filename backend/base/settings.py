@@ -63,7 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'custommiddle.middleware.CustomTokenMiddleware',
+    # 'custommiddle.middleware.CustomTokenMiddleware',
 ]
 
 ROOT_URLCONF = 'base.urls'
@@ -150,18 +150,18 @@ AUTH_USER_MODEL = 'accounts.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # token start
-CUSTOM_PREFIX = 'TOKEN_MID'
-TOKEN_MID_BACKEND_ONLY = True
-TOKEN_MID_STRATEGY = "WEAK"
-TOKEN_MID_FILTERED_METHODS = ['POST']
-TOKEN_MID_FILTERED_URLS = [
-    # re.compile(r'^(.*)/api'),
-    re.compile(r'^/api/signin'),
-    re.compile(r'^/api/signup'),
-    re.compile(r'^/api/comment'),
-    re.compile(r'^(.*)/admin/(.*)'),
-]
-TOKEN_MID_TIMES = 24
+# CUSTOM_PREFIX = 'TOKEN_MID'
+# TOKEN_MID_BACKEND_ONLY = True
+# TOKEN_MID_STRATEGY = "WEAK"
+# TOKEN_MID_FILTERED_METHODS = ['POST']
+# TOKEN_MID_FILTERED_URLS = [
+#     # re.compile(r'^(.*)/api'),
+#     re.compile(r'^/api/signin'),
+#     re.compile(r'^/api/signup'),
+#     re.compile(r'^/api/comment'),
+#     re.compile(r'^(.*)/admin/(.*)'),
+# ]
+# TOKEN_MID_TIMES = 24
 
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000', 'http://localhost:3000',

@@ -18,6 +18,7 @@ from base.serializer import to_dict
 from base.serializer import converter, serialize
 from base.const import *
 from base.utils import useCache
+from base.auth import AuthBearer
 
 from custommiddle.models import Token
 from blog.models import *
@@ -114,7 +115,7 @@ class MyRenderer(BaseRenderer):
             return json.dumps([])
 
 
-api = NinjaAPI(description=description, csrf=False, renderer=MyRenderer())
+api = NinjaAPI(urls_namespace="api",description=description, csrf=False, renderer=MyRenderer(),auth=AuthBearer(),version="1.00")
 
 
 class TokenSchema(Schema):
