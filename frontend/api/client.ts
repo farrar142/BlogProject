@@ -1,20 +1,23 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { API_BASE } from '../src/global';
-import { getCookie } from '../src/functions/cookies';
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { API_BASE } from "../src/global";
+import { getCookie } from "../src/functions/cookies";
 const API_BASE_URL = API_BASE;
 
 let $$retry: boolean = false;
+console.log(API_BASE_URL);
 const client = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 client.interceptors.request.use(async (config: AxiosRequestConfig) => {
+  console.log(config.baseURL);
   try {
-    const token = getCookie('token');
-    console.log(token);
-    // config.headers['Authorization'] = `Bearer ${token}`;
+    const token = getCookie("token");
+    if (config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   } catch (e) {
     //
   }
@@ -29,7 +32,7 @@ client.interceptors.response.use(
     const requestConfig: AxiosRequestConfig = error.config;
 
     if (response?.status === 401 && !$$retry) {
-      const refresh = getCookie('token');
+      const refresh = getCookie("token");
 
       if (refresh === null) {
         return Promise.reject(error);

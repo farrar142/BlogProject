@@ -29,6 +29,7 @@ from tasks import send_accounts_find_email
 from ninja.pagination import paginate
 from functools import wraps
 
+
 class ConcatSubquery(Subquery):
     """ Concat multiple rows of a subquery with only one column in one cell.
         Subquery must return only one column.
@@ -95,9 +96,9 @@ description = """
 """
 
 
-
 def qs_to_list(query_set):
     return list(map(lambda x: to_dict(x), query_set))
+
 
 class MyRenderer(BaseRenderer):
     media_type = "application/json"
@@ -115,7 +116,8 @@ class MyRenderer(BaseRenderer):
             return json.dumps([])
 
 
-api = NinjaAPI(urls_namespace="api",description=description, csrf=False, renderer=MyRenderer(),auth=AuthBearer(),version="1.00")
+api = NinjaAPI(urls_namespace="api", description=description,
+               csrf=False, renderer=MyRenderer(), version="1.00")
 
 
 class TokenSchema(Schema):
@@ -154,30 +156,6 @@ def delete_cache(request):
     return target.delete()
 
 
-@api.post('signin', url_name="signin")
-def signin(request, user: UserForm):
-    username = user.username.strip()
-    password = user.password.strip()
-    token = login(username, password)
-    print(f"로그인 이벤트 발생 // {token}")
-    if token:
-        return token
-    return HttpResponseForbidden(request)
-
-
-class TokenForm(Schema):
-    token: str
-
-
-@api.post('accounts/check_login')
-def check_login(request, form: TokenForm):
-    token = Token.objects.filter(token=form.token)
-    if token:
-        return {"result": True}
-    else:
-        return {"result": False}
-
-
 def login(username, password):
     token = ""
     if username and password:
@@ -212,7 +190,7 @@ class InfoForm(TokenSchema):
 @api.post('userinfo')
 def get_user_info(request, form: InfoForm):
     user = User.objects.filter(pk=request.user.pk).prefetch_related('blog').annotate(blog_id=F(
-        "blog__id"),blog_name=F("blog__name")).values( 'username', 'user_id', 'email', 'blog_id', 'blog_name',"profile_url")
+        "blog__id"), blog_name=F("blog__name")).values('username', 'user_id', 'email', 'blog_id', 'blog_name', "profile_url")
     return user
 
 
@@ -256,7 +234,7 @@ class BlogNameForm(TokenSchema):
 
 @api.post('blog/edit')
 def post_blog_name_change(request, form: BlogNameForm):
-    blog:QuerySet= Blog.objects.filter(user=request.user, pk=form.blog_id)
+    blog: QuerySet = Blog.objects.filter(user=request.user, pk=form.blog_id)
     if blog.exists():
         target: Blog = blog.first()
         target.name = form.blog_name
@@ -287,23 +265,26 @@ def get_random_articles(request, tag: str = ""):
 def get_all_articles_id(request):
     return Article.objects.filter(deleted_at__isnull=True, status=0).values('id', "blog_id")
 
-def get_int_num_from_kwargs(kwargs:dict,key:str,default_num=0):
+
+def get_int_num_from_kwargs(kwargs: dict, key: str, default_num=0):
     page = kwargs.get(key)
-    if isinstance(page,str):
+    if isinstance(page, str):
         return int(page)
-    elif isinstance(page,int):
+    elif isinstance(page, int):
         return page
     else:
         return default_num
 
-def pagination(func=None,offset=1,limit=10):
+
+def pagination(func=None, offset=1, limit=10):
     def decorator(cb):
         @wraps(cb)
-        def wrapper(qs:QuerySet, *args, **kwargs):
-            page = get_int_num_from_kwargs(kwargs,"page",default_num=offset)
-            perPage =get_int_num_from_kwargs(kwargs,"perPage",default_num=limit)
+        def wrapper(qs: QuerySet, *args, **kwargs):
+            page = get_int_num_from_kwargs(kwargs, "page", default_num=offset)
+            perPage = get_int_num_from_kwargs(
+                kwargs, "perPage", default_num=limit)
             paginated_qs = qs[(page-1)*perPage:page*perPage]
-            result:QuerySet = cb(paginated_qs, *args, **kwargs)
+            result: QuerySet = cb(paginated_qs, *args, **kwargs)
             qs_len = 0
             try:
                 qs_len = qs.count()
@@ -312,20 +293,21 @@ def pagination(func=None,offset=1,limit=10):
             length = math.ceil(qs_len/perPage)
             return {
                 "type": "paginated",
-                "contentLength":qs_len,
-                "currentLength":len(result),
+                "contentLength": qs_len,
+                "currentLength": len(result),
                 "maxPage": length,
                 "curPage": page,
-                "perPage":perPage,
-                "hasNext": page<length,
+                "perPage": perPage,
+                "hasNext": page < length,
                 "results": converter(result),
             }
         return wrapper
     return decorator(func) if callable(func) else decorator
 
+
 @api.get('articles/{blog_id}')
-def get_articles(request, blog_id:int, page: int = 1, perPage: int = 10, tag: str = "", context: bool = False):
-    
+def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: str = "", context: bool = False):
+
     blog = Blog.objects.filter(pk=blog_id)
     if not blog:
         return []
@@ -337,20 +319,22 @@ def get_articles(request, blog_id:int, page: int = 1, perPage: int = 10, tag: st
     articles = articles.order_by("-reg_date")
     if tag:
         articles = get_hashtag_articles(articles, tag)
-    return articles_formatter(articles, page=page,perPage=perPage, context=context)
+    return articles_formatter(articles, page=page, perPage=perPage, context=context)
+
 
 @pagination
-def articles_formatter(articles: QuerySet, page=1,perPage=10, order_by="-reg_date", context=False,images=False):
+def articles_formatter(articles: QuerySet, page=1, perPage=10, order_by="-reg_date", context=False, images=False):
     try:
-        articles = articles.select_related('blog').prefetch_related('comment','tags','images')
+        articles = articles.select_related(
+            'blog').prefetch_related('comment', 'tags', 'images')
     except:
         pass
     result_set = []
     for article in articles:
         comment_count = article.comment.all().count()
-        dictmodel:dict = to_dict(article)
-        dictmodel.update(comment_count=comment_count,hashtags=dictmodel.get('tags'),
-                    blog_id=article.blog.pk)
+        dictmodel: dict = to_dict(article)
+        dictmodel.update(comment_count=comment_count, hashtags=dictmodel.get('tags'),
+                         blog_id=article.blog.pk)
         dictmodel.pop("tags")
         if images:
             dictmodel.update(images=qs_to_list(article.images.all()))
@@ -374,7 +358,7 @@ def get_tags(request, blog_id: int):
 @api.get('article/{article_id}')
 def get_article(request, article_id: int):
     article = Article.cached.filter(article_id)
-    return articles_formatter(article,context=True,images=True)
+    return articles_formatter(article, context=True, images=True)
 
 
 @api.post('article/{article_id}/delete')
@@ -385,31 +369,37 @@ def delete_article(request, article_id: int, form: TokenSchema):
         return HttpResponse("success")
     else:
         return HttpResponseBadRequest("failed")
+
+
 class SizeForm(Schema):
-    width:int = 1
-    height:int = 1    
+    width: int = 1
+    height: int = 1
+
 
 class ImageForm(Schema):
-    id : int
+    id: int
     dataURL: str
     size: SizeForm
-    type:str
+    type: str
+
 
 class ArticleForm(TokenSchema):
     title: str
     tags: str
     context: str
-    images:List[ImageForm]=None
-    
+    images: List[ImageForm] = None
+
+
 @api.get('images')
 def get_images(request):
     return Image.objects.all()
+
 
 @api.post("article/{articleId}/edit")
 def editArticle(request, articleId: int, form: ArticleForm, action: str = "write"):
     user = request.user
     blog = user.blog.all().first()
-    print(form,action)
+    print(form, action)
     if action == "write":
         article = Article(user=user, blog=blog,
                           title=form.title, context=form.context)
@@ -418,13 +408,13 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
             Image.objects.create(
                 object_id=image.id,
                 dataURL=image.dataURL,
-                size = image.size.dict(),
+                size=image.size.dict(),
                 type=image.type,
                 article=article
             )
         tags_setter(article, form.tags)
     elif action == "edit":
-        article:Article = Article.objects.filter(pk=articleId).first()
+        article: Article = Article.objects.filter(pk=articleId).first()
         article.title = form.title
         article.context = form.context
         article.images.all().delete()
@@ -432,7 +422,7 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
             Image.objects.create(
                 object_id=image.id,
                 dataURL=image.dataURL,
-                size = image.size.dict(),
+                size=image.size.dict(),
                 type=image.type,
                 article=article
             )

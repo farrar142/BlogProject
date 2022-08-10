@@ -30,7 +30,7 @@ const Home = (props: { tags: Tags }) => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const tags = await axios.get(API_BASE + `/blogs/0/tags`);
+  const tags = await axios.get(API_BASE + `/api/blogs/0/tags`);
   // const errorCode = articles.data.length == 0 ? 404 : false;
   // const errorCode = false;
   // return {
@@ -54,6 +54,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       // errorCode,
       // articles: articles.data,
       tags: tags.data,
+      // tags: [],
     },
   };
 };

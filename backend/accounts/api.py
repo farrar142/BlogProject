@@ -1,21 +1,26 @@
+import datetime
 from typing import List
+
+from base.auth import AuthBearer
+from base.serializer import to_dict
+from base.settings import SECRET_KEY
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import AnonymousUser
+from django.db.models import QuerySet
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
-from ninja import ModelSchema, NinjaAPI, Schema
-import datetime
-from django.contrib.auth import authenticate
 from jose import jwt
+from ninja import ModelSchema, NinjaAPI, Schema
+
 from accounts.models import User
-from base.serializer import to_dict
-from base.auth import AuthBearer
-from base.settings import SECRET_KEY
-from django.contrib.auth.hashers import check_password, make_password
-auth = NinjaAPI(urls_namespace="auth",csrf=False,version="1.01")
+
+auth = NinjaAPI(urls_namespace="auth", csrf=False, version="1.01")
 
 
 class UserLoginSchema(Schema):
     password: str
-    username:str
+    username: str
 
 
 class TokenForm(Schema):
@@ -30,17 +35,19 @@ class UserOut(Schema):
 
 
 class SimpleForm(Schema):
-    test:str
-    
-@auth.post('/test/signin',auth=AuthBearer())
+    test: str
+
+
+@auth.post('/test/signin', auth=AuthBearer())
 def index(request):
-    return {"data":"success"}
+    return {"data": "success"}
+
 
 @auth.post('signin')
 def signin(request, form: UserLoginSchema):
     user = authenticate(request, **form.dict())
     if user:
-        return {"token":User.offer_token(user.pk)}
+        return {"token": User.offer_token(user.pk)}
     return HttpResponseForbidden()
 
 
@@ -73,8 +80,7 @@ def signup(request, form: UserSignUpForm):
             "data": []
         }
     else:
-        user = User.objects.create(
-            username=form.username, email=form.email, password=make_password(form.password))
+        user = User.create(**form.dict())
         return {
             "status": 0,
             "message": f"환영합니다 {form.username}님",
@@ -82,6 +88,28 @@ def signup(request, form: UserSignUpForm):
         }
 
 
-@auth.post('user', auth=AuthBearer())
+class Change_User(Schema):
+    key: str
+    value: str
+
+
+@auth.post('update', auth=AuthBearer(), response=UserOut)
+def update_user(request, form: Change_User):
+    auth: User = request.auth
+    user = User.objects.filter(pk=auth.pk)
+    if not isinstance(user.first(), AnonymousUser):
+        try:
+            value = form.value if form.key != "password" else make_password(
+                form.value)
+            update = {form.key: value}
+            user.update(**update)
+            return user.first()
+        except:
+            return HttpResponseForbidden()
+    else:
+        return HttpResponseForbidden()
+
+
+@auth.post('userinfo', auth=AuthBearer(), response=UserOut)
 def get_user_info(request):
     return request.auth

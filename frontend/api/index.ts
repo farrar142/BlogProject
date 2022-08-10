@@ -1,8 +1,10 @@
-import Article from './article';
-import Blog from './blog';
+import Article from "./article";
+import Auth from "./auth";
+import Blog from "./blog";
 
 const API = {
   Article,
   Blog,
+  Auth,
 };
 export default API;

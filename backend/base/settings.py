@@ -54,7 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # 'custommiddle.middleware.JsonFormatter',
     'corsheaders.middleware.CorsMiddleware',
-    'custommiddle.middleware.TimeChecker',
+    # 'custommiddle.middleware.TimeChecker',
     'custommiddle.middleware.ResponseCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

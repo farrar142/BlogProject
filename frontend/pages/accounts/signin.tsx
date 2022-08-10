@@ -1,37 +1,38 @@
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import Container from '@mui/material/Container';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import axios from 'axios';
-import { useRouter } from 'next/router';
-import * as React from 'react';
-import { useSysMsg } from '../../components/MySnackBar';
-import { useUserInfo } from '../../src/atoms';
-import { deleteCookie, setCookie } from '../../src/functions/cookies';
-import { API_BASE } from '../../src/global';
-import getUserInfo, { UserInfoDefault } from '../../src/hooks/getUserInfo';
-import { UserInfo } from '../../types/accounts';
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import Container from "@mui/material/Container";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import axios from "axios";
+import { useRouter } from "next/router";
+import * as React from "react";
+import API from "../../api";
+import { useSysMsg } from "../../components/MySnackBar";
+import { useUserInfo } from "../../src/atoms";
+import { deleteCookie, setCookie } from "../../src/functions/cookies";
+import { API_BASE } from "../../src/global";
+import getUserInfo, { UserInfoDefault } from "../../src/hooks/getUserInfo";
+import { UserInfo } from "../../types/accounts";
 function Copyright(props: any) {
   return (
     <Typography
-      variant='body2'
-      color='text.secondary'
-      align='center'
+      variant="body2"
+      color="text.secondary"
+      align="center"
       {...props}
     >
-      {'Copyright © '}
-      <Link color='inherit' href='https://soundcloud.com/sandring-443999826'>
+      {"Copyright © "}
+      <Link color="inherit" href="https://soundcloud.com/sandring-443999826">
         Your Website
-      </Link>{' '}
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
@@ -41,93 +42,93 @@ export default function SignIn() {
   const router = useRouter();
   const [userInfo, setUserInfo] = useUserInfo();
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
-    console.log('try login');
+    console.log("try login");
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const datas = {
-      username: data.get('username'),
-      password: data.get('password'),
+      username: (data.get("username") as string) || "",
+      password: (data.get("password") as string) || "",
     };
-    const res = await axios.post(API_BASE + '/signin', datas);
+    console.log(datas);
+    const res = await API.Auth.signIn(datas);
     if (res.status == 200) {
-      console.log(res.data[0]);
       // sessionStorage.setItem("token", res.data[0].token);
-      deleteCookie('token');
-      const token = res.data[0].token;
-      setCookie('token', token, res.data[0].expired_in);
+      deleteCookie("token");
+      const token = res.data.token;
+      setCookie("token", token);
       getUserInfo(setUserInfo).then((res) => {
         router.back();
       });
-      setMsg({ type: 'success', message: '로그인되었습니다!' });
+      setMsg({ type: "success", message: "로그인되었습니다!" });
     } else {
-      setMsg({ type: 'warning', message: '일치하는 회원 정보가 없어요!' });
+      setMsg({ type: "warning", message: "일치하는 회원 정보가 없어요!" });
     }
   };
   console.log(msg);
   //getInfo
   const handleLogout = () => {};
   return (
-    <Container component='main' maxWidth='xs' sx={{ marginTop: '20vh' }}>
+    <Container component="main" maxWidth="xs" sx={{ marginTop: "20vh" }}>
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component='h1' variant='h5'>
+        <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component='form' onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
-            margin='normal'
+            margin="normal"
             required
             fullWidth
-            id='username'
-            label='Username'
-            name='username'
-            autoComplete='username'
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
             autoFocus
-            color='secondary'
+            color="secondary"
           />
           <TextField
-            margin='normal'
+            margin="normal"
             required
             fullWidth
-            name='password'
-            label='Password'
-            type='password'
-            id='password'
-            autoComplete='current-password'
-            color='secondary'
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            color="secondary"
           />
           <FormControlLabel
-            control={<Checkbox value='remember' color='secondary' />}
-            label='Remember me'
-            color='secondary'
+            control={<Checkbox value="remember" color="secondary" />}
+            label="Remember me"
+            color="secondary"
           />
           <Button
-            color='secondary'
-            type='submit'
+            color="secondary"
+            type="submit"
             fullWidth
-            variant='contained'
+            variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href='/accounts/Idfinder' color='secondary'>
-                <Typography color='black'>Forgot password?</Typography>
+              <Link href="/accounts/Idfinder" color="secondary">
+                <Typography color="black">Forgot password?</Typography>
               </Link>
             </Grid>
             <Grid item>
-              <Link href='/accounts/signup' color='secondary'>
-                <Typography color='black'>Sign Up</Typography>
+              <Link href="/accounts/signup" color="secondary">
+                <Typography color="black">Sign Up</Typography>
               </Link>
             </Grid>
           </Grid>
