@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+from blog.models import Blog
 
 from base.auth import AuthBearer
 from base.serializer import to_dict
@@ -29,6 +30,7 @@ class TokenForm(Schema):
 
 class UserOut(Schema):
     user_id: int
+    blog_id: int
     username: str
     email: str
     profile_url: str = None
@@ -97,13 +99,13 @@ class Change_User(Schema):
 def update_user(request, form: Change_User):
     auth: User = request.auth
     user = User.objects.filter(pk=auth.pk)
-    if not isinstance(user.first(), AnonymousUser):
+    if not isinstance(user.get(), AnonymousUser):
         try:
             value = form.value if form.key != "password" else make_password(
                 form.value)
             update = {form.key: value}
             user.update(**update)
-            return user.first()
+            return user.get().get_user_info()
         except:
             return HttpResponseForbidden()
     else:
@@ -112,4 +114,5 @@ def update_user(request, form: Change_User):
 
 @auth.post('userinfo', auth=AuthBearer(), response=UserOut)
 def get_user_info(request):
-    return request.auth
+    blogs = Blog.objects.filter(user__id=request.auth.pk)
+    return request.auth.get_user_info()

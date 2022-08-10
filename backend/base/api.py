@@ -10,6 +10,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import AnonymousUser
 
 from ninja import NinjaAPI, Schema
 from ninja.renderers import BaseRenderer
@@ -183,17 +184,6 @@ def signup(request, form: UserSignupForm):
     return HttpResponse('success')
 
 
-class InfoForm(TokenSchema):
-    pass
-
-
-@api.post('userinfo')
-def get_user_info(request, form: InfoForm):
-    user = User.objects.filter(pk=request.user.pk).prefetch_related('blog').annotate(blog_id=F(
-        "blog__id"), blog_name=F("blog__name")).values('username', 'user_id', 'email', 'blog_id', 'blog_name', "profile_url")
-    return user
-
-
 class EditForm(TokenSchema):
     data: str
 
@@ -227,22 +217,20 @@ def get_blogs_id(request):
     return blog
 
 
-class BlogNameForm(TokenSchema):
+class BlogNameForm(Schema):
     blog_id: int
     blog_name: str
 
 
-@api.post('blog/edit')
+@api.post('blog/edit', auth=AuthBearer())
 def post_blog_name_change(request, form: BlogNameForm):
-    blog: QuerySet = Blog.objects.filter(user=request.user, pk=form.blog_id)
-    if blog.exists():
-        target: Blog = blog.first()
-        target.name = form.blog_name
-        target.save()
-        return blog
+    if isinstance(request.auth, AnonymousUser):
+        return HttpResponseForbidden()
+    res = request.auth.create_blog(form.blog_id, form.blog_name)
+    if res:
+        return res
     else:
-        blog = Blog.objects.create(user=request.user, name=form.blog_name)
-        return blog
+        return HttpResponseForbidden()
 
 
 @api.get('blog/{blog_id}')

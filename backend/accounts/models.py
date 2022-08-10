@@ -1,9 +1,12 @@
 import datetime
 from django.utils import timezone
 from django.db import models
+from django.db.models import QuerySet
+from django.apps import apps
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import check_password, make_password
 from jose import jwt
+from base.serializer import to_dict
 
 from base.settings import SECRET_KEY
 # Create your models here.
@@ -49,6 +52,32 @@ class User(AbstractUser):
         self.save()
         self.refresh_from_db()
         return self
+
+    def get_user_info(self):
+        blogs = self.blog.all()
+        blog_id = 0
+        if blogs.exists():
+            blog_id = blogs.first().id
+        resp = to_dict(self)
+        resp["blog_id"] = blog_id
+        return resp
+
+    def create_blog(self, blog_id, blog_name):
+        Blog = apps.get_model('blog.blog')
+        is_other_blog = Blog.objects.filter(pk=blog_id)
+        if is_other_blog.exists():
+            if is_other_blog.first().user.pk != self.pk:
+                return False
+        blog: QuerySet = Blog.objects.filter(
+            user=self, pk=blog_id)
+        if blog.exists():
+            target = blog.first()
+            target.name = blog_name
+            target.save()
+            return target
+        else:
+            created = Blog.objects.create(user=self, name=blog_name)
+            return created
 
     @classmethod
     def offer_token(cls, pk):

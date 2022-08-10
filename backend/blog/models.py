@@ -11,6 +11,10 @@ class Blog(TimeMixin):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='blog')
     name = models.CharField('블로그이름', max_length=50)
+
+    def update_blog_name(self, name):
+        self.name = name
+        self.save()
 # Create your models here.
 
 
@@ -53,14 +57,16 @@ class Image(models.Model):
     object_id = models.IntegerField('버켓오브젝트ID')
     dataURL = models.TextField('경로')
     size = models.JSONField('가로세로길이')
-    type = models.CharField('파일타입',max_length=20)
-    article = models.ForeignKey(Article,related_name="images",on_delete=models.CASCADE)
-    
-    def delete(self,*args,**kwargs):
-        result = requests.delete(url=f"https://media.honeycombpizza.link/mediaserver/file/{self.object_id}")
-        return super().delete(*args,**kwargs)
-        
-    
+    type = models.CharField('파일타입', max_length=20)
+    article = models.ForeignKey(
+        Article, related_name="images", on_delete=models.CASCADE)
+
+    def delete(self, *args, **kwargs):
+        result = requests.delete(
+            url=f"https://media.honeycombpizza.link/mediaserver/file/{self.object_id}")
+        return super().delete(*args, **kwargs)
+
+
 class SaveHistory(models.Model):
     saved_date = models.DateTimeField(auto_now=True)
     article = models.ForeignKey(
