@@ -14,7 +14,7 @@ from base.const import *
 from base.utils import useCache
 from base.auth import AuthBearer
 
-comments = NinjaAPI(urls_namespace="articles",csrf=False, renderer=MyRenderer(), version="1.00")
+comments = NinjaAPI(urls_namespace="comments",csrf=False, renderer=MyRenderer(), version="1.00")
 
 class CommentForm(Schema):
     username: str = None

@@ -81,6 +81,7 @@ class TestCase(TestCase):
     username = "sandring"
     email = "test@example.conm"
     password = "test1234"
+    blog_name = "test_blog"
 
     def auto_login(self):
         self.signup()
@@ -90,6 +91,30 @@ class TestCase(TestCase):
         self.client.authorize(user)
         self.user = user
         return user
+
+    def make_blog(self):
+        resp = self.client.post(
+            "/api/blog/edit", {"blog_id": 0, "blog_name": self.blog_name})
+        self.assertEqual(resp.status_code,200)
+
+    def make_article(self,title="test_article"):
+        resp = self.client.post('/api/article/0/edit?action=write',{
+            "title":title,
+            "tags":"#test #tags",
+            "context":"test_context_long",
+            "images":[{
+                "id":0,
+                "dataURL":"https://test.2.image.com/testimage.jpeg",
+                "size":{
+                    "width":100,
+                    "height":100
+                },
+                "type":"jpeg"
+            }]
+        })
+        self.assertEqual(resp.status_code,200)
+        return resp.json()
+        
 
     def signup(self):
         self.client.post('/auth/signup', data={

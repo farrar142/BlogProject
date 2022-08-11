@@ -1,5 +1,5 @@
 from typing import List
-from ninja import NinjaAPI, Schema
+from ninja import NinjaAPI, Schema,Field
 from ninja.renderers import BaseRenderer
 from django.db.models import QuerySet
 from django.db.models import F
@@ -60,24 +60,25 @@ class ImageForm(Schema):
 
 
 class ArticleForm(Schema):
-    title: str
+    title: str = Field(...,min_length=1)
     tags: str
-    context: str
+    context: str= Field(...,min_length=1)
     images: List[ImageForm] = None
 
 
 article = NinjaAPI(urls_namespace="article",csrf=False, renderer=MyRenderer(), version="1.00")
 
 
-@article.post("{articleId}/edit")
+@article.post("{articleId}/edit",auth=AuthBearer())
 def editArticle(request, articleId: int, form: ArticleForm, action: str = "write"):
-    user = request.user
-    blog = user.blog.all().first()
-    print(form, action)
+    user = request.auth
+    blogs:QuerySet[Blog] = user.blog.all()
+    if not blogs.exists():
+        return HttpResponseForbidden()
+    blog:Blog = blogs[0]
     if action == "write":
-        article = Article(user=user, blog=blog,
+        article = Article.create(user=user, blog=blog,
                           title=form.title, context=form.context)
-        article.save()
         for image in form.images:
             Image.objects.create(
                 object_id=image.id,
@@ -86,7 +87,7 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
                 type=image.type,
                 article=article
             )
-        tags_setter(article, form.tags)
+        article.tags_setter(form.tags)
     elif action == "edit":
         article: Article = Article.objects.filter(pk=articleId).get()
         article.title = form.title
@@ -101,7 +102,7 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
                 article=article
             )
         if article:
-            tags_setter(article, form.tags)
+            article.tags_setter(form.tags)
         pass
     else:
         article = None
@@ -127,14 +128,6 @@ def delete_article(request, article_id: int):
 
 
 
-def tags_setter(article: Article, rawtags: str):
-    article.tags.clear()
-    tags = tag_joiner(rawtags)
-    if tags:
-        for i in tags:
-            article.tags.add(HashTag.objects.get_or_create(name=i)[0])
-    article.save()
-
 
 @pagination
 def articles_formatter(articles: QuerySet, page=1, perPage=10, order_by="-reg_date", context=False, images=False):
@@ -156,8 +149,6 @@ def articles_formatter(articles: QuerySet, page=1, perPage=10, order_by="-reg_da
             dictmodel.pop("context")
         result_set.append(dictmodel)
     return result_set
-def tag_joiner(words: str):
-    return ''.join(words.split()).split('#')[1:]
 
 
 def get_hashtag_articles(articles: QuerySet, name):

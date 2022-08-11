@@ -112,7 +112,7 @@ class BlogNameForm(Schema):
 def post_blog_name_change(request, form: BlogNameForm):
     if isinstance(request.auth, AnonymousUser):
         return HttpResponseForbidden()
-    res = request.auth.create_blog(form.blog_id, form.blog_name)
+    res = Blog.create_blog(request.auth,form.blog_id, form.blog_name)
     if res:
         return res
     else:

@@ -62,22 +62,6 @@ class User(AbstractUser):
         resp["blog_id"] = blog_id
         return resp
 
-    def create_blog(self, blog_id, blog_name):
-        Blog = apps.get_model('blog.blog')
-        is_other_blog = Blog.objects.filter(pk=blog_id)
-        if is_other_blog.exists():
-            if is_other_blog.first().user.pk != self.pk:
-                return False
-        blog: QuerySet = Blog.objects.filter(
-            user=self, pk=blog_id)
-        if blog.exists():
-            target = blog.first()
-            target.name = blog_name
-            target.save()
-            return target
-        else:
-            created = Blog.objects.create(user=self, name=blog_name)
-            return created
 
     @classmethod
     def offer_token(cls, pk):

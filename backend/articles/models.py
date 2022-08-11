@@ -24,6 +24,13 @@ class Article(TimeMixin):
     status = models.SmallIntegerField('상태', default=0, null=True, blank=True)
 
     @classmethod
+    def create(cls,user:User,blog:Blog,title:str,context:str):
+        article = cls(user=user, blog=blog,
+                          title=title, context=context)
+        article.save()
+        return article
+
+    @classmethod
     def get_articles(cls, **kwargs):
         result = cls.objects.filter()
         return result
@@ -34,6 +41,16 @@ class Article(TimeMixin):
         cached.set(self.pk, Article.objects.filter(id=self.pk))
         SaveHistory.objects.create(article=self)
 
+    def tags_setter(self, rawtags: str):
+        self.tags.clear()
+        tags = self.tag_joiner(rawtags)
+        if tags:
+            for i in tags:
+                self.tags.add(HashTag.objects.get_or_create(name=i)[0])
+        self.save()
+
+    def tag_joiner(self,words: str):
+        return ''.join(words.split()).split('#')[1:]
     def __str__(self):
         return self.title
 

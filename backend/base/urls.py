@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from comments.api import comments
 from blog.api import api as blog
 from articles.api import  articles,article
 from accounts.api import auth 
@@ -27,5 +28,6 @@ urlpatterns = [
     path('auth/',auth.urls),
     path('api/blog/', blog.urls),
     path('api/articles/',articles.urls),
-    path('api/article/',article.urls)
+    path('api/article/',article.urls),
+    path("api/comments/",comments.urls)
 ]

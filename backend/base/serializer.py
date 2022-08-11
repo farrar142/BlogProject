@@ -35,7 +35,6 @@ def converter(queries: QuerySet) -> []:
 
 
 def type_checker(queries):
-    print(type(queries))
     if isinstance(queries, models.Model):  # Model속성일경우
         target = queries.__dict__
     elif isinstance(queries, QuerySet):

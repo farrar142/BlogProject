@@ -12,7 +12,7 @@ from .models import Blog
 
 
 class Test_Blog_CRUD(TestCase):
-
+    
     def test_로그인_안되어있을시_블로그_만들기_실패(self):
         resp = self.client.post(
             "/api/blog/edit", {"blog_id": 0, "blog_name": "test_blog"})
@@ -46,10 +46,13 @@ class Test_Blog_CRUD(TestCase):
         blog_id = blog.get("id")
         other_user = User.create(
             username="other_user", email="other@example.com", password="other_password")
-        other_blog: Blog = other_user.create_blog(0, "other_blog")
-        resp2 = self.client.post(
-            "/api/blog/edit", {"blog_id": other_blog.pk, "blog_name": "change_blog_name"})
-        self.assertEqual(resp2.status_code, 403)
+        other_blog = Blog.create_blog(other_user,0, "other_blog")
+        if other_blog:
+            resp2 = self.client.post(
+                "/api/blog/edit", {"blog_id": other_blog.pk, "blog_name": "change_blog_name"})
+            self.assertEqual(resp2.status_code, 403)
+        else:
+            self.assertEqual(False,True)
 
     def test_자신의_블로그는_업데이트_가능(self):
         user = self.auto_login()
@@ -59,7 +62,7 @@ class Test_Blog_CRUD(TestCase):
         blog_id = blog.get("id")
         other_user = User.create(
             username="other_user", email="other@example.com", password="other_password")
-        blog_maded = other_user.create_blog(0, "other_blog")
+        blog_maded = Blog.create_blog(other_user,0, "other_blog")
         if blog_maded:
             other_blog: Blog = blog_maded
             self.client.authorize(other_user)
@@ -72,5 +75,3 @@ class Test_Blog_CRUD(TestCase):
             self.assertEqual(True, False)
 
 
-class Test_Article_CRUD(TestCase):
-    pass

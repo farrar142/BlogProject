@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse
 import requests
 from accounts.models import User
@@ -15,6 +16,24 @@ class Blog(TimeMixin):
     def update_blog_name(self, name):
         self.name = name
         self.save()
+        
+    @classmethod
+    def create_blog(cls, user:User,blog_id, blog_name):
+        is_other_blogs = cls.objects.filter(pk=blog_id)
+        other_blog = is_other_blogs.first()
+        if other_blog:
+            if other_blog.user.pk != user.pk:
+                return False
+        blogs: QuerySet[cls] = cls.objects.filter(
+            user=user, pk=blog_id)
+        blog = blogs.first()
+        if blog:
+            blog.name = blog_name
+            blog.save()
+            return blog
+        else:
+            created = Blog.objects.create(user=user, name=blog_name)
+            return created
 # Create your models here.
 
 
