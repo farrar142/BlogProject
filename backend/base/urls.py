@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views
 from blog.api import api as blog
-from articles.api import api as articles
+from articles.api import  articles,article
 from accounts.api import auth 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +26,6 @@ urlpatterns = [
     # path('', views.index, name='index'),
     path('auth/',auth.urls),
     path('api/blog/', blog.urls),
+    path('api/articles/',articles.urls),
+    path('api/article/',article.urls)
 ]
