@@ -37,10 +37,10 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'novel',
     'tasks',
     'corsheaders',
     'custommiddle',
+    'articles',
     'blog',
     'accounts',
     'django.contrib.admin',
