@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -8,16 +8,16 @@ import {
   Divider,
   Button,
   Theme,
-} from '@mui/material';
-import Router, { useRouter } from 'next/router';
-import { NextPage } from 'next';
-import { useUserInfo } from '../../src/atoms';
-import API from '../../api';
+} from "@mui/material";
+import Router, { useRouter } from "next/router";
+import { NextPage } from "next";
+import { useUserInfo } from "../../src/atoms";
+import API from "../../api";
 const MyPage: NextPage = () => {
   const router = useRouter();
   const [infos, setInfo] = useUserInfo();
   const m_styles = styles;
-  const [blogName, setBlogName] = useState('');
+  const [blogName, setBlogName] = useState("");
 
   useEffect(() => {
     setBlogName(infos.blog_name);
@@ -30,7 +30,7 @@ const MyPage: NextPage = () => {
   const blogNameChange = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (blogName.length <= 1) {
-      console.log('err! 좀더 긴 이름을 사용하길 원함');
+      console.log("err! 좀더 긴 이름을 사용하길 원함");
       return;
     }
     const data = {
@@ -40,10 +40,12 @@ const MyPage: NextPage = () => {
     console.log(data);
     const blogs = await API.Blog.postBlogName(data);
     if (blogs.status >= 400) {
-      console.log('err!');
+      console.log("err!");
     } else {
-      console.log('success!');
+      console.log("success!");
+      const { id, name } = blogs.data[0];
       router.push(`/blog/${blogs.data[0].id}`);
+      setInfo({ ...infos, blog_id: id, blog_name: name });
     }
   };
 
@@ -58,19 +60,19 @@ const MyPage: NextPage = () => {
           <Typography sx={m_styles.infoItems}>블로그이름 </Typography>
           <Divider />
         </Box>
-        <Box component='form' onSubmit={blogNameChange} sx={m_styles.infoBox}>
+        <Box component="form" onSubmit={blogNameChange} sx={m_styles.infoBox}>
           <Typography sx={m_styles.infoItems}>{infos.username}</Typography>
           <Divider />
           <Typography sx={m_styles.infoItems}>{infos.email}</Typography>
           <Divider />
           <Box sx={m_styles.infoItems}>
             <TextField
-              size='small'
-              color='secondary'
+              size="small"
+              color="secondary"
               label={blogName}
               onChange={blogNameHandler}
             />
-            <Button type='submit' variant='contained'>
+            <Button type="submit" variant="contained">
               변경
             </Button>
             <Divider />
@@ -83,30 +85,30 @@ const MyPage: NextPage = () => {
 
 const styles = {
   mainContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
   infoCon: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: '20px',
-    width: '500px',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    padding: "20px",
+    width: "500px",
   },
   infoBox: {
-    marginRight: '20px',
-    marginLeft: '20p',
+    marginRight: "20px",
+    marginLeft: "20p",
   },
   infoItems: {
-    height: '40px',
-    marginTop: '5px',
-    marginBottom: '5pxx',
-    marginRight: '5px',
-    marginLeft: '5px',
-    display: 'flex',
-    alignItems: 'center',
+    height: "40px",
+    marginTop: "5px",
+    marginBottom: "5pxx",
+    marginRight: "5px",
+    marginLeft: "5px",
+    display: "flex",
+    alignItems: "center",
   },
 };
 export default MyPage;

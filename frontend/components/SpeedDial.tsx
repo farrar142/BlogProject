@@ -87,6 +87,9 @@ export default function BasicSpeedDial({ auth }: MyProps) {
         if (action.auth == 1 && auth.user_id == 0) {
           return;
         }
+        if (action.name == "Write" && auth.blog_id === 0) {
+          return;
+        }
         if (action.name == "Edit" || action.name == "Delete") {
           if (parseInt(blog_id) !== auth.blog_id) {
             return;
