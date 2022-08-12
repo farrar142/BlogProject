@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import QuerySet
-from django.http import HttpResponseForbidden
+from django.http import *
 from django.shortcuts import get_object_or_404
 from jose import jwt
 from ninja import ModelSchema, NinjaAPI, Schema
