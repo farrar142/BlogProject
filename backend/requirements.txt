@@ -17,5 +17,3 @@ gunicorn
 
 django-ninja-jwt
 python-jose[cryptography]
-
-dotenv
