@@ -13,6 +13,7 @@ import { API_BASE } from '../../src/global';
 import Router, { useRouter } from 'next/router';
 import axios from 'axios';
 import { useSysMsg } from '../../components/MySnackBar';
+import API from '../../api';
 
 function Copyright(props: any) {
   return (
@@ -78,9 +79,10 @@ export default function SignUp() {
       return setMsg({ type: 'warning', message: emailValid });
     }
     const datas = { username, email, password };
-    const res = await axios.post(API_BASE + '/signup', datas);
+    console.log(datas);
+    const res = await API.Auth.signUp(datas);
 
-    if (res.data === 'success') {
+    if (res.data.status === 0) {
       setMsg({
         type: 'success',
         message: `가입한 것을 환영합니다 ${username}님`,

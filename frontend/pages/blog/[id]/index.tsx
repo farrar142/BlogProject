@@ -76,8 +76,8 @@ type paramsType = {
   id: number;
 };
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const blogInfo = await axios.get(API_BASE + `/blog/${query.id}`);
-  const blogTags = await axios.get(API_BASE + `/blogs/${query.id}/tags`);
+  const blogInfo = await axios.get(API_BASE + `/api/blog/${query.id}`);
+  const blogTags = await axios.get(API_BASE + `/api/blog/${query.id}/tags`);
   const errorCode = blogInfo.data.length == 0 ? 404 : false;
 
   if (errorCode) {

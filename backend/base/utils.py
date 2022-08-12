@@ -2,7 +2,7 @@ from django.core.cache import cache
 
 
 class useCache:
-    def __init__(self, model):
+    def __init__(self, model: str):
         self.model = model
         self.data = cache.get_or_set(self.model, {})
 

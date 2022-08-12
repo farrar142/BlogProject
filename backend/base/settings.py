@@ -15,8 +15,9 @@ import re
 
 import django
 from pathlib import Path
-from base.secret import DATABASES, GOOGLE_ACCOUNT, GOOGLE_PASSWORD, REDIS_HOST
 from django.utils.encoding import smart_str
+from dotenv import load_dotenv
+load_dotenv()
 django.utils.encoding.smart_text = smart_str
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v_b^-&6fihj9)+672z&iwnr#9c$+h-^7a%h^u2$eot62njz9e0'
+SECRET_KEY = os.getenv("SECRET_KEY")
 CSRF_TRUSTED_ORIGINS = ["https://blog.honeycombpizza.link"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,10 +38,11 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'novel',
+    'comments',
     'tasks',
     'corsheaders',
     'custommiddle',
+    'articles',
     'blog',
     'accounts',
     'django.contrib.admin',
@@ -54,7 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # 'custommiddle.middleware.JsonFormatter',
     'corsheaders.middleware.CorsMiddleware',
-    'custommiddle.middleware.TimeChecker',
+    # 'custommiddle.middleware.TimeChecker',
     'custommiddle.middleware.ResponseCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -98,9 +100,6 @@ WSGI_APPLICATION = 'base.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = DATABASES
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -119,6 +118,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+OS = platform.system().strip().lower()
+DB_NAME = os.getenv("DB_NAME")
+HOST = os.getenv("DB_HOST")
+USER = os.getenv("DB_USER")
+PASSWORD = os.getenv("DB_PASSWORD")
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': DB_NAME,
+        'USER': USER,
+        'PASSWORD': PASSWORD,
+        'HOST': HOST,
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+        },
+    },
+}
+
+REDIS_HOST = f"redis://:gksdjf452@@{HOST}:6379/1"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -198,8 +220,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = GOOGLE_ACCOUNT
-EMAIL_HOST_PASSWORD = GOOGLE_PASSWORD
+EMAIL_HOST_USER = os.getenv("GOOGLE_ACCOUNT")
+EMAIL_HOST_PASSWORD = os.getenv("GOOGLE_PASSWORD")
 # mailserver end
 
 NINJA_PAGINATION_PER_PAGE = 10

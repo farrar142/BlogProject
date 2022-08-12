@@ -1,18 +1,19 @@
-import { UserInfo } from './../../types/accounts/index';
-import axios from 'axios';
-import { getCookie } from '../functions/cookies';
-import { API_BASE } from '../global';
+import { UserInfo } from "./../../types/accounts/index";
+import axios from "axios";
+import { getCookie } from "../functions/cookies";
+import { API_BASE } from "../global";
+import API from "../../api";
 
 export const checkLogin = () => {
   return new Promise<boolean | UserInfo>((resolve, reject) => {
     try {
-      const token = getCookie('token');
+      const token = getCookie("token");
       if (!token) {
         resolve(false);
       } else {
-        axios.post(API_BASE + '/userinfo', { token }).then((res) => {
-          console.log('로그인 체크 완료');
-          resolve(res.data[0]);
+        API.Auth.getUserInfo().then((res) => {
+          console.log("로그인 체크 완료");
+          resolve(res.data);
         });
       }
     } catch {
@@ -23,7 +24,7 @@ export const checkLogin = () => {
 
 const getUserInfo = async (handler: (e: UserInfo) => void) => {
   const res = await checkLogin();
-  if (res && typeof res !== 'boolean') {
+  if (res && typeof res !== "boolean") {
     handler(res);
     return res;
   } else {
@@ -32,10 +33,10 @@ const getUserInfo = async (handler: (e: UserInfo) => void) => {
   }
 };
 export const UserInfoDefault = {
-  username: '',
+  username: "",
   user_id: 0,
-  email: '',
+  email: "",
   blog_id: 0,
-  profile_url: '',
+  profile_url: "",
 };
 export default getUserInfo;
