@@ -37,6 +37,7 @@ export const UserInfoDefault = {
   user_id: 0,
   email: "",
   blog_id: 0,
+  blog_name: "",
   profile_url: "",
 };
 export default getUserInfo;
