@@ -1,19 +1,26 @@
+import os
 from django.db import models
 from django.urls import reverse
 import requests
 from accounts.models import User
+from base.api_base import qs_to_list
+from base.serializer import to_dict
 from blog.models import Blog
 from base.models import *
 from base.utils import useCache
 from blog.manager import CachedManager
+from dotenv import load_dotenv
+load_dotenv()
 # Create your models here.
+
 
 class HashTag(models.Model):
     name = models.CharField('해시태그', max_length=20)
-    
+
+
 class Article(TimeMixin):
     objects = models.Manager()
-    cached = CachedManager()
+    cached = CachedManager(model="article")
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='articles')
     blog = models.ForeignKey(
@@ -24,9 +31,9 @@ class Article(TimeMixin):
     status = models.SmallIntegerField('상태', default=0, null=True, blank=True)
 
     @classmethod
-    def create(cls,user:User,blog:Blog,title:str,context:str):
+    def create(cls, user: User, blog: Blog, title: str, context: str):
         article = cls(user=user, blog=blog,
-                          title=title, context=context)
+                      title=title, context=context)
         article.save()
         return article
 
@@ -49,8 +56,21 @@ class Article(TimeMixin):
                 self.tags.add(HashTag.objects.get_or_create(name=i)[0])
         self.save()
 
-    def tag_joiner(self,words: str):
+    def tag_joiner(self, words: str):
         return ''.join(words.split()).split('#')[1:]
+
+    def get_article_info(self, context=False, images=False):
+        comment_count = self.article_comment.all().count()
+        dictmodel: dict = to_dict(self)
+        dictmodel.update(comment_count=comment_count, hashtags=dictmodel.get('tags'),
+                         blog_id=self.blog.pk)
+        dictmodel.pop("tags")
+        if images:
+            dictmodel.update(images=qs_to_list(self.images.all()))
+        if not context:
+            dictmodel.pop("context")
+        return dictmodel
+
     def __str__(self):
         return self.title
 
@@ -65,7 +85,7 @@ class Image(models.Model):
 
     def delete(self, *args, **kwargs):
         result = requests.delete(
-            url=f"https://media.honeycombpizza.link/mediaserver/file/{self.object_id}")
+            url=f"{os.getenv('MEDIA_SERVER')}/{self.object_id}")
         return super().delete(*args, **kwargs)
 
 
@@ -73,4 +93,3 @@ class SaveHistory(models.Model):
     saved_date = models.DateTimeField(auto_now=True)
     article = models.ForeignKey(
         Article, on_delete=models.CASCADE, related_name='savehistories')
-

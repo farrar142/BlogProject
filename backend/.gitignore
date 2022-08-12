@@ -1,2 +1,7 @@
 secret.py
 /base/secret.py
+.env
+.vscode
+sftp.json
+*.pyc
+.next

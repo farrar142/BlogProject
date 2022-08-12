@@ -1,20 +1,22 @@
 from typing import List
-from ninja import NinjaAPI, Schema,Field
+from ninja import NinjaAPI, Schema, Field
 from ninja.renderers import BaseRenderer
 from django.db.models import QuerySet
 from django.db.models import F
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest,HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from articles.models import *
 from base.api_base import MyRenderer
 from base.serializer import to_dict
 
-from base.api_base import pagination,qs_to_list
+from base.api_base import pagination, qs_to_list
 from base.serializer import converter, serialize
 from base.const import *
 from base.utils import useCache
 from base.auth import AuthBearer
 
-articles = NinjaAPI(urls_namespace="articles",csrf=False, renderer=MyRenderer(), version="1.00")
+articles = NinjaAPI(urls_namespace="articles", csrf=False,
+                    renderer=MyRenderer(), version="1.00")
+
 
 @articles.get('random')
 def get_random_articles(request, tag: str = ""):
@@ -27,7 +29,6 @@ def get_random_articles(request, tag: str = ""):
 @articles.get('all/id')
 def get_all_articles_id(request):
     return Article.objects.filter(deleted_at__isnull=True, status=0).values('id', "blog_id")
-
 
 
 @articles.get('{blog_id}')
@@ -60,25 +61,26 @@ class ImageForm(Schema):
 
 
 class ArticleForm(Schema):
-    title: str = Field(...,min_length=1)
+    title: str = Field(..., min_length=1)
     tags: str
-    context: str= Field(...,min_length=1)
+    context: str = Field(..., min_length=1)
     images: List[ImageForm] = None
 
 
-article = NinjaAPI(urls_namespace="article",csrf=False, renderer=MyRenderer(), version="1.00")
+article = NinjaAPI(urls_namespace="article", csrf=False,
+                   renderer=MyRenderer(), version="1.00")
 
 
-@article.post("{articleId}/edit",auth=AuthBearer())
+@article.post("{articleId}/edit", auth=AuthBearer())
 def editArticle(request, articleId: int, form: ArticleForm, action: str = "write"):
     user = request.auth
-    blogs:QuerySet[Blog] = user.blog.all()
+    blogs: QuerySet[Blog] = user.blog.all()
     if not blogs.exists():
         return HttpResponseForbidden()
-    blog:Blog = blogs[0]
+    blog: Blog = blogs[0]
     if action == "write":
         article = Article.create(user=user, blog=blog,
-                          title=form.title, context=form.context)
+                                 title=form.title, context=form.context)
         for image in form.images:
             Image.objects.create(
                 object_id=image.id,
@@ -109,7 +111,6 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
     return Article.cached.filter(article.pk)
 
 
-
 @article.get('{article_id}')
 def get_article(request, article_id: int):
     article = Article.cached.filter(article_id)
@@ -126,33 +127,19 @@ def delete_article(request, article_id: int):
         return HttpResponseBadRequest("failed")
 
 
-
-
-
 @pagination
-def articles_formatter(articles: QuerySet, page=1, perPage=10, order_by="-reg_date", context=False, images=False):
+def articles_formatter(articles: QuerySet[Article], page=1, perPage=10, order_by="-reg_date", context=False, images=False):
     try:
         articles = articles.select_related(
-            'blog').prefetch_related('comment', 'tags', 'images')
+            'blog').prefetch_related('article_comment', 'tags', 'images')
     except:
         pass
     result_set = []
     for article in articles:
-        comment_count = article.article_comment.all().count()
-        dictmodel: dict = to_dict(article)
-        dictmodel.update(comment_count=comment_count, hashtags=dictmodel.get('tags'),
-                         blog_id=article.blog.pk)
-        dictmodel.pop("tags")
-        if images:
-            dictmodel.update(images=qs_to_list(article.images.all()))
-        if not context:
-            dictmodel.pop("context")
-        result_set.append(dictmodel)
+        formatted = article.get_article_info(images=images, context=context)
+        result_set.append(formatted)
     return result_set
 
 
 def get_hashtag_articles(articles: QuerySet, name):
     return articles.filter(tags__name=name)
-
-
-

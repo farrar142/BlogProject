@@ -119,6 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 OS = platform.system().strip().lower()
+DB_NAME = os.getenv("DB_NAME")
 HOST = os.getenv("DB_HOST")
 USER = os.getenv("DB_USER")
 PASSWORD = os.getenv("DB_PASSWORD")
@@ -126,7 +127,7 @@ PASSWORD = os.getenv("DB_PASSWORD")
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blog',
+        'NAME': DB_NAME,
         'USER': USER,
         'PASSWORD': PASSWORD,
         'HOST': HOST,

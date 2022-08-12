@@ -29,12 +29,12 @@ module.exports = {
       },
       {
         source: "/mediaserver/:path*",
-        destination: "https://media.honeycombpizza.link/mediaserver/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_MEDIASERVER}/mediaserver/:path*`,
         permanent: false,
       },
       {
         source: "/media/:path*",
-        destination: "https://media.honeycombpizza.link/media/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_MEDIA}/:path*`,
         permanent: false,
       },
       {

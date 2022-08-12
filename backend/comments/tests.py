@@ -18,5 +18,5 @@ class Test_Comment_CRUD(TestCase):
         user = self.auto_login()
         self.make_blog()
         article_id = self.make_article()[0].get("id")
-        self.assertEqual(isinstance(article_id,int),True)
-        self.assertEqual(article_id,2)
+        self.assertEqual(isinstance(article_id, int), True)
+        self.assertGreater(article_id, 1)

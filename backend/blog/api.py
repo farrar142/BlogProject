@@ -28,7 +28,6 @@ from tasks import send_accounts_find_email
 from ninja.pagination import paginate
 
 
-
 description = """
 # 모의 주식 투자 시뮬레이터 API DOCS\n
 ### RESULT EX\n
@@ -56,11 +55,9 @@ description = """
 """
 
 
-
-
-
 api = NinjaAPI(urls_namespace="api", description=description,
                csrf=False, renderer=MyRenderer(), version="1.00")
+
 
 class UserForm(Schema):
     username: str = ""
@@ -112,7 +109,7 @@ class BlogNameForm(Schema):
 def post_blog_name_change(request, form: BlogNameForm):
     if isinstance(request.auth, AnonymousUser):
         return HttpResponseForbidden()
-    res = Blog.create_blog(request.auth,form.blog_id, form.blog_name)
+    res = Blog.create_blog(request.auth, form.blog_id, form.blog_name)
     if res:
         return res
     else:
@@ -137,12 +134,6 @@ def get_tags(request, blog_id: int):
 # 블로그 end
 
 
-
-
-
-
-
-
 @api.get("accounts/find/mail")
 def mail_send(request, useremail: str):
     target = User.objects.filter(email=useremail)
@@ -154,7 +145,3 @@ def mail_send(request, useremail: str):
             return {"message": "실패"}
     else:
         return {"message": "유저가 존재하지 않습니다"}
-
-
-
-

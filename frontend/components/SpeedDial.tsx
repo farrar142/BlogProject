@@ -53,7 +53,7 @@ export default function BasicSpeedDial({ auth }: MyProps) {
       auth: 1,
       func: () => {
         if (window.confirm("정말로 삭제하시겠어요?")) {
-          axios.post(API_BASE + `/article/${article_id}/delete`, {
+          axios.post(API_BASE + `/api/article/${article_id}/delete`, {
             token: getCookie("token"),
           });
           router.back();
