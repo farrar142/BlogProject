@@ -35,7 +35,7 @@ client.interceptors.response.use(
       const refresh = getCookie("token");
 
       if (refresh === null) {
-        return Promise.reject(error);
+        return Promise.resolve(error);
       }
 
       $$retry = true;
@@ -49,7 +49,7 @@ client.interceptors.response.use(
     } else if ($$retry) {
       // TODO: force redirection
     }
-    return Promise.reject(error);
+    return Promise.resolve(error);
   }
 );
 export default client;
