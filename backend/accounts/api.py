@@ -114,5 +114,4 @@ def update_user(request, form: Change_User):
 
 @auth.post('userinfo', auth=AuthBearer(), response=UserOut)
 def get_user_info(request):
-    blogs = Blog.objects.filter(user__id=request.auth.pk)
     return request.auth.get_user_info()

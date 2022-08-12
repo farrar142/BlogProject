@@ -1,6 +1,6 @@
-import * as React from "react";
-import Link from "@mui/material/Link";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import * as React from 'react';
+import Link from '@mui/material/Link';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
   Box,
   Typography,
@@ -8,37 +8,37 @@ import {
   Button,
   Avatar,
   TextField,
-} from "@mui/material";
-import { API_BASE } from "../../src/global";
-import Router, { useRouter } from "next/router";
-import axios from "axios";
-import { useSysMsg } from "../../components/MySnackBar";
-import API from "../../api";
+} from '@mui/material';
+import { API_BASE } from '../../src/global';
+import Router, { useRouter } from 'next/router';
+import axios from 'axios';
+import { useSysMsg } from '../../components/MySnackBar';
+import API from '../../api';
 
 function Copyright(props: any) {
   return (
     <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
+      variant='body2'
+      color='text.secondary'
+      align='center'
       {...props}
     >
-      {"Copyright © "}
-      <Link color="inherit" href="https://soundcloud.com/sandring-443999826">
+      {'Copyright © '}
+      <Link color='inherit' href='https://soundcloud.com/sandring-443999826'>
         Your Website
-      </Link>{" "}
+      </Link>{' '}
       {new Date().getFullYear()}
-      {"."}
+      {'.'}
     </Typography>
   );
 }
 
 export default function SignUp() {
   const [sysMsg, setMsg] = useSysMsg();
-  const [email, setEmail] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [password2, setPassword2] = React.useState("");
+  const [email, setEmail] = React.useState('');
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [password2, setPassword2] = React.useState('');
   const router = useRouter();
   function validEmailCheck(value: string) {
     var pattern =
@@ -46,24 +46,24 @@ export default function SignUp() {
     return value.match(pattern) != null;
   }
   const emailValidation = () => {
-    if (email == "") {
+    if (email == '') {
       return false;
     }
     if (!validEmailCheck(email)) {
-      return "이메일을 정확하게 입력해주세요";
+      return '이메일을 정확하게 입력해주세요';
     }
     return false;
   };
 
   const passwordValidation = () => {
-    if (password2 == "") {
+    if (password2 == '') {
       return false;
     }
     if (password !== password2) {
-      return "패스워드가 일치하지 않습니다";
+      return '패스워드가 일치하지 않습니다';
     }
     if (password.length < 8) {
-      return "비밀번호는 8자 이상 이여야 됩니다.";
+      return '비밀번호는 8자 이상 이여야 됩니다.';
     } else {
       return false;
     }
@@ -72,117 +72,118 @@ export default function SignUp() {
     event.preventDefault();
 
     if (!(password === password2)) {
-      return setMsg({ type: "warning", message: "정보가 옳바르지 않아요" });
+      return setMsg({ type: 'warning', message: '정보가 옳바르지 않아요' });
     }
     const emailValid = emailValidation();
     if (emailValid) {
-      return setMsg({ type: "warning", message: emailValid });
+      return setMsg({ type: 'warning', message: emailValid });
     }
     const datas = { username, email, password };
+    console.log(datas);
     const res = await API.Auth.signUp(datas);
 
     if (res.data.status === 0) {
       setMsg({
-        type: "success",
+        type: 'success',
         message: `가입한 것을 환영합니다 ${username}님`,
       });
-      Router.push("/accounts/signin");
+      Router.push('/accounts/signin');
     } else {
-      setMsg({ type: "warning", message: "정보가 옳바르지 않아요" });
+      setMsg({ type: 'warning', message: '정보가 옳바르지 않아요' });
     }
   };
   return (
-    <Container component="main" maxWidth="xs" sx={{ marginTop: "20vh" }}>
+    <Container component='main' maxWidth='xs' sx={{ marginTop: '20vh' }}>
       <Box
         sx={{
           marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">
+        <Typography component='h1' variant='h5'>
           Sign Up
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box component='form' onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             onChange={(e) => setUsername(e.target.value)}
             value={username}
-            margin="normal"
+            margin='normal'
             required
             fullWidth
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="off"
+            id='username'
+            label='Username'
+            name='username'
+            autoComplete='off'
             autoFocus
-            color="secondary"
+            color='secondary'
           />
           <TextField
             error={emailValidation() ? true : false}
-            margin="normal"
+            margin='normal'
             required
             fullWidth
-            name="email"
-            label="Email"
-            type="email"
-            id="email"
-            autoComplete="true"
-            color="secondary"
+            name='email'
+            label='Email'
+            type='email'
+            id='email'
+            autoComplete='true'
+            color='secondary'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             helperText={emailValidation()}
           />
           <TextField
             error={passwordValidation() ? true : false}
-            margin="normal"
+            margin='normal'
             required
             fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
+            name='password'
+            label='Password'
+            type='password'
+            id='password'
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
             }}
             helperText={passwordValidation()}
-            autoComplete="off"
-            color="secondary"
+            autoComplete='off'
+            color='secondary'
           />
           <TextField
             error={passwordValidation() ? true : false}
-            margin="normal"
+            margin='normal'
             required
             fullWidth
-            name="password2"
-            label="Password2"
-            type="password"
-            id="password2"
+            name='password2'
+            label='Password2'
+            type='password'
+            id='password2'
             helperText={passwordValidation()}
             value={password2}
             onChange={(e) => {
               setPassword2(e.target.value);
             }}
-            autoComplete="off"
-            color="secondary"
+            autoComplete='off'
+            color='secondary'
           />
           <Button
-            color="secondary"
-            type="submit"
+            color='secondary'
+            type='submit'
             fullWidth
-            variant="contained"
+            variant='contained'
             sx={{ mt: 3, mb: 2 }}
           >
             Sign Up
           </Button>
           <Button
-            color="secondary"
+            color='secondary'
             fullWidth
-            variant="contained"
+            variant='contained'
             sx={{ mt: 3, mb: 2 }}
             onClick={() => router.back()}
           >

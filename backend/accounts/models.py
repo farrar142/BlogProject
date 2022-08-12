@@ -56,10 +56,14 @@ class User(AbstractUser):
     def get_user_info(self):
         blogs = self.blog.all()
         blog_id = 0
+        blog_name = ""
         if blogs.exists():
-            blog_id = blogs.first().id
+            blog = blogs.first()
+            blog_id = blog.id
+            blog_name = blog.name
         resp = to_dict(self)
         resp["blog_id"] = blog_id
+        resp["blog_name"]=blog_name
         return resp
 
 

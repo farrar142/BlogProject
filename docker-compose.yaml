@@ -19,6 +19,10 @@ services:
     restart: unless-stopped
     # cpus: .10
     # mem_limit: "1.5G"
+    environment:
+      TZ: 'Asia/Seoul'
+    depends_on:
+      - 'db'
   next:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://172.17.0.1:${FRONT_PORT}']
@@ -37,3 +41,35 @@ services:
     ports:
       - ${FRONT_PORT}:3000
     restart: unless-stopped
+    environment:
+      TZ: 'Asia/Seoul'
+    depends_on:
+      - 'db'
+  db:
+    image: 'mariadb:latest'
+    container_name: 'db'
+    ports:
+      - '3306:3306'
+    # volumes:
+    #   - /docker_projects/mariadb__1/etc:/etc/mysql
+    #   - /docker_projects/mariadb__1/run/mysqld:/run/mysqld
+    #   - /docker_projects/mariadb__1/mysql:/var/lib/mysql
+    environment:
+      MARIADB_USER: '${DB_HOST}'
+      MARIADB_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MARIADB_DATABASE: 'blog'
+      TZ: 'Asia/Seoul'
+    restart: unless-stopped
+  redis:
+    image: redis:latest
+    command: 'redis-server --port 6379 --appendonly yes --requirepass ${DB_PASSWORD}'
+    container_name: redis
+    hostname: root
+    labels:
+      - 'name=redis'
+      - 'mode=standalone'
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    environment:
+      TZ: 'Asia/Seoul'
