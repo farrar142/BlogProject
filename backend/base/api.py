@@ -115,7 +115,7 @@ class MyRenderer(BaseRenderer):
             return json.dumps([])
 
 
-api = NinjaAPI(urls_namespace="api",description=description, csrf=False, renderer=MyRenderer(),auth=AuthBearer(),version="1.00")
+api = NinjaAPI(urls_namespace="api",description=description, csrf=False, renderer=MyRenderer(),version="1.00")
 
 
 class TokenSchema(Schema):

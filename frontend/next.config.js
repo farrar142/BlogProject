@@ -19,7 +19,12 @@ module.exports = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://blogbackend.honeycombpizza.link/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_PATH}/api/:path*`,
+        permanent: false,
+      },
+      {
+        source: '/auth/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_PATH}/auth/:path*`,
         permanent: false,
       },
       {
