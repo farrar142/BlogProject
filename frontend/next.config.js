@@ -19,22 +19,17 @@ module.exports = {
     return [
       {
         source: "/api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_PATH}/api/:path*`,
-        permanent: false,
-      },
-      {
-        source: "/auth/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_PATH}/auth/:path*`,
+        destination: "https://blogbackend.honeycombpizza.link/api/:path*",
         permanent: false,
       },
       {
         source: "/mediaserver/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_MEDIASERVER}/mediaserver/:path*`,
+        destination: "https://media.honeycombpizza.link/mediaserver/:path*",
         permanent: false,
       },
       {
         source: "/media/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_MEDIA}/:path*`,
+        destination: "https://media.honeycombpizza.link/media/:path*",
         permanent: false,
       },
       {
