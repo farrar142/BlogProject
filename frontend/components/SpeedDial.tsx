@@ -23,7 +23,6 @@ type MyProps = {
   auth: UserInfo;
 };
 export default function BasicSpeedDial({ auth }: MyProps) {
-  console.log("auth", auth);
   const router = useRouter();
   const [isDark, setDark] = useDarkMode();
   const [sysMsg, setMsg] = useSysMsg();

@@ -62,7 +62,6 @@ const WriteArticle = ({
     }))
   );
   const [discardImages, setDiscardImages] = useState<MyImageType[]>([]);
-  console.log(article);
   useEffect(() => {
     const token = getCookie("token");
     if (!token) {

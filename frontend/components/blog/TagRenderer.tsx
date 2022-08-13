@@ -11,7 +11,6 @@ export function MainTagRenderer(props: TagRendererProps) {
   const tags = props.tags;
   const router = useRouter();
   const curPath = router.asPath.split("?")[0];
-  console.log(tags);
   return (
     <Stack sx={styles.mainTagCon} direction="row" spacing={1}>
       <Link href={curPath}>

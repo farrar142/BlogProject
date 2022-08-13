@@ -12,7 +12,6 @@ export const checkLogin = () => {
         resolve(false);
       } else {
         API.Auth.getUserInfo().then((res) => {
-          console.log("로그인 체크 완료");
           resolve(res.data);
         });
       }

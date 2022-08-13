@@ -46,7 +46,6 @@ const ArticleViewPage = ({
   const router = useRouter();
   const viewerRef = useRef(null);
   const [isDark, setDark] = useDarkMode();
-  console.log(article);
   if (errorCode == 404) {
     return <Error statusCode={errorCode} />;
   }

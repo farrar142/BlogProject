@@ -40,9 +40,7 @@ const CommentView: React.FC<CommentViewProps> = ({ comments, article_id }) => {
       password: formData.get("password"),
       parent_id: null,
     };
-    console.log(data);
     const res = await axios.post(API_BASE + "/comment/", data);
-    console.log(res);
     setComments([..._comments, res.data[0]]);
   };
   const delComment = async (id: number) => {
@@ -53,7 +51,6 @@ const CommentView: React.FC<CommentViewProps> = ({ comments, article_id }) => {
     const res = await axios.delete(API_BASE + `/comment/${id}/`, {
       data: { token },
     });
-    console.log(res);
     setComments(_comments.filter((comment) => comment.id !== id));
   };
   return (

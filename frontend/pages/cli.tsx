@@ -162,7 +162,6 @@ const CliComp: NextPage = () => {
     })
       .then((res: any) => {
         setFiles(res["files"]);
-        console.log(res["files"]);
         //filtering
         const regexUser = `\\[${user}\\@.*\\]\\#`;
         const regexPath = `\\[${user}\\@.*\\]\\# cd ${path}`;
@@ -193,8 +192,6 @@ const CliComp: NextPage = () => {
         // .replace(/(\r\n\s)+$/gm, "");
         // .replace(/\s$/gm, "");
         const resultContext = regexResult;
-        // console.log(JSON.stringify(cmd));
-        // console.log(JSON.stringify(resultContext));
         setContext(resultContext.trim());
         if (!cmd.includes("echo -e")) {
           setEdit("");
@@ -477,7 +474,6 @@ const CliComp: NextPage = () => {
               // }}
               inputValue={cmd}
               onInputChange={(e, nV) => {
-                console.log(nV);
                 setInputValue(nV);
                 setCmd(nV);
               }}

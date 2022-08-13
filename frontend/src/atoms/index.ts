@@ -60,7 +60,6 @@ const userInfoSelector = selector<UserInfo>({
   key: "userInfoSelector",
   get: async ({ get }) => {
     const token = get(tokenAtom);
-    console.log("tokenHer", token);
     if (!token) {
       return get(userDataAtom);
     } else {
@@ -69,7 +68,6 @@ const userInfoSelector = selector<UserInfo>({
     }
   },
   set: ({ set }, newValue) => {
-    console.log("set!!", newValue);
     set(userDataAtom, newValue);
   },
 });
