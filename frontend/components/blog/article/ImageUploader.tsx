@@ -45,7 +45,6 @@ const MyImageUploader = (props: imageUploaderProps) => {
   const [value, setValue] = useState(0);
   const [progress, setProgress] = useState<number>(0);
   const max = maxNumber;
-  console.log(images);
   const uploadHandler = useCallback(
     async (e: ChangeEvent<HTMLInputElement> | any) => {
       let el: File[] = [];
@@ -58,7 +57,6 @@ const MyImageUploader = (props: imageUploaderProps) => {
       }
       // const el = e.currentTarget.files;
       const fileList = await FilesToMyType(el, props.userId, setProgress);
-      console.log("fileList", fileList);
       setImages([...images, ...fileList].filter((res, idx) => idx < maxNumber));
       if (images.length < dpImage + 1) {
         setDpImage(0);
@@ -167,7 +165,6 @@ const MyImageUploader = (props: imageUploaderProps) => {
     };
   };
   const onImageRemove = (index: number) => {
-    // removeFile(images[index]).then((res) => console.log(res.data));
     setDiscardImages([...discardImages, images[index]]);
     const _images = images.filter((res, idx) => idx != index);
     setImages(_images);
@@ -383,21 +380,18 @@ export async function getSizeWithUrl(
   url: string
 ): Promise<Omit<MyImageType, "id">> {
   const _image: HTMLImageElement = document.createElement("img");
-  console.log(url);
   return new Promise((resolve, reject) => {
     let size = {
       width: 1,
       height: 1,
     };
     if (url) {
-      console.log("이미지구하는중");
       _image.src = url;
       _image.onload = () => {
         size = {
           width: _image.width != 0 ? _image.width : 1,
           height: _image.height != 0 ? _image.height : 1,
         };
-        console.log("이미지 크기 구함");
         resolve({ dataURL: url, size, type: "image" });
       };
     } else {
@@ -436,7 +430,6 @@ export const uploadImageByFiles = async (
         ...files,
         url: sanitizeUrl(files.url),
       }));
-      console.log("mediaurls", media_urls);
     });
   return media_urls;
 };

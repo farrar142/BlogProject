@@ -78,7 +78,6 @@ const WriteArticle = ({ errorCode, blog, tags }: WriteArticleProps) => {
       token,
       images: images,
     };
-    console.log(data);
     const res = await API.Article.postArticleById(0, "write", data);
     const success = res.data[0];
     if (success) {

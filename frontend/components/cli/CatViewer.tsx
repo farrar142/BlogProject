@@ -64,7 +64,6 @@ export const CatViewer = (props: CatViewerProps) => {
   const handleSetTab = (
     e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    console.log(e);
     if (e.key === "Tab" && textRef.current) {
       e.preventDefault();
       const target = textRef.current;

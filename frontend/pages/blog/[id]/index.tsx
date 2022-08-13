@@ -1,22 +1,22 @@
-import { Container } from '@mui/material';
-import axios from 'axios';
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import Request from '../../../api';
-import { ArticlesRenderer } from '../../../components/blog/ArticleRenderer';
-import BlogNavBar from '../../../components/blog/navbar';
-import { MainTagRenderer } from '../../../components/blog/TagRenderer';
-import MyPagination from '../../../components/MyPagination';
-import { useBlogPagination, useUserInfo } from '../../../src/atoms';
-import { API_BASE } from '../../../src/global';
+import { Container } from "@mui/material";
+import axios from "axios";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import Request from "../../../api";
+import { ArticlesRenderer } from "../../../components/blog/ArticleRenderer";
+import BlogNavBar from "../../../components/blog/navbar";
+import { MainTagRenderer } from "../../../components/blog/TagRenderer";
+import MyPagination from "../../../components/MyPagination";
+import { useBlogPagination, useUserInfo } from "../../../src/atoms";
+import { API_BASE } from "../../../src/global";
 import {
   ArticlesType,
   ArticleType,
   BlogInfoType,
   Tags,
-} from '../../../types/blog/blogTags';
-import Error from '../../_error';
+} from "../../../types/blog/blogTags";
+import Error from "../../_error";
 const PersonalBlog = ({
   errorCode,
   blog,
@@ -39,7 +39,6 @@ const PersonalBlog = ({
   };
   useEffect(() => {
     Request.Article.getArticleByBlog(blogId, { page, tag }).then((res) => {
-      console.log(res);
       setArticles(res.data.results);
       setMaxPage(res.data.maxPage);
       if (!isLoaded) {
@@ -100,16 +99,16 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 const styles = {
   mainCon: {},
   articleCon: {
-    marginBottom: '100px',
+    marginBottom: "100px",
   },
   pagination: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'fixed',
-    bottom: '60px',
-    margin: '0 auto',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "fixed",
+    bottom: "60px",
+    margin: "0 auto",
     left: 0,
     right: 0,
   },

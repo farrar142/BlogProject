@@ -103,7 +103,6 @@ export default function SignIn() {
     } else {
       rememberUserData.setUserData(userDataDefault);
     }
-    console.log(datas);
     const res = await API.Auth.signIn(datas);
     if (res.status == 200) {
       // sessionStorage.setItem("token", res.data[0].token);

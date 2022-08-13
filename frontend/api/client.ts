@@ -4,7 +4,6 @@ import { getCookie } from "../src/functions/cookies";
 const API_BASE_URL = API_BASE;
 
 let $$retry: boolean = false;
-console.log(API_BASE_URL);
 const client = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,7 +11,6 @@ const client = axios.create({
   },
 });
 client.interceptors.request.use(async (config: AxiosRequestConfig) => {
-  console.log(config.baseURL);
   try {
     const token = getCookie("token");
     if (config.headers) {
