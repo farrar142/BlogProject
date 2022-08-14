@@ -1,6 +1,7 @@
 from typing import List
 from ninja import NinjaAPI, Schema
 from ninja.renderers import BaseRenderer
+from django.contrib.auth.models import AnonymousUser
 from django.db.models import QuerySet
 from django.db.models import F
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -34,20 +35,40 @@ def get_comments(request, article_id: int):
     return comments
 
 
-@comment.post('')
+@comment.post('', auth=AuthBearer())
 def postComment(request, form: CommentForm):
-    if (form.username and form.password) or form.user_id:
-        comment = Comment.objects.create(**form.dict())
-        return comment_formatter({"id": comment.id})
+    if isinstance(request.auth, User):
+        comment = Comment.create_authorize(
+            article_id=form.article_id, user_id=form.user_id, context=form.context)
     else:
-        return []
+        comment = Comment.create_unauthorize(
+            article_id=form.article_id, username=form.username, password=form.password, context=form.context)
+    return comment_formatter({"id": comment.pk})
 
 
-@comment.delete('{comment_id}/')
-def del_comments(request, comment_id: int):
-    comment = Comment.objects.filter(id=comment_id)
-    comment.delete()
-    return True
+class CommentDelArgs(Schema):
+    comment_id: int
+    type: str
+    password: str = None
+
+
+@comment.delete('{comment_id}/', auth=AuthBearer())
+def del_comments(request, comment_id: int, form: CommentDelArgs):
+
+    if isinstance(request.auth, User):
+        comment = Comment.objects.filter(user_id=request.auth, id=comment_id)
+        if not comment.exists():
+            return {"result": False, "message": "댓글이 존재하지 않습니다"}
+        comment.delete()
+        return {"result": True, "message": "삭제에 성공했습니다 인증된 유저"}
+    else:
+        comment = Comment.objects.filter(
+            id=comment_id, password=form.password)
+        if not comment.exists():
+            return {"result": False, "message": "비밀번호가 일치하지 않습니다."}
+        comment.delete()
+        comment.delete()
+        return {"result": True, "message": "삭제에 성공했습니다 미인증 유저"}
 
 
 def comment_formatter(condition):

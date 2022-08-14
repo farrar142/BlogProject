@@ -33,8 +33,8 @@ module.exports = {
         permanent: false,
       },
       {
-        source: "/media/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_MEDIA}/:path*`,
+        source: `/${process.env.NEXT_PUBLIC_MEDIA_PATH}/:path*`,
+        destination: `https://media.honeycombpizza.link/${process.env.NEXT_PUBLIC_MEDIA_PATH}/:path*`,
         permanent: false,
       },
       {
