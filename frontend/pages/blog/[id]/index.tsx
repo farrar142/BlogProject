@@ -3,13 +3,14 @@ import axios from "axios";
 import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Request from "../../../api";
+import API from "../../../api";
 import { ArticlesRenderer } from "../../../components/blog/ArticleRenderer";
 import BlogNavBar from "../../../components/blog/navbar";
 import { MainTagRenderer } from "../../../components/blog/TagRenderer";
 import MyPagination from "../../../components/MyPagination";
 import { useBlogPagination, useUserInfo } from "../../../src/atoms";
 import { API_BASE } from "../../../src/global";
+import { usePaginatedQuery } from "../../../src/hooks/usePagination";
 import {
   ArticlesType,
   ArticleType,
@@ -26,41 +27,46 @@ const PersonalBlog = ({
   blog: BlogInfoType;
   tags: Tags;
 }) => {
-  const [articles, setArticles] = useState<ArticleType[]>([]);
-  const [length, setLength] = useState<number>(0);
   const router = useRouter();
   const blogId = router.query.id as unknown as number;
   const tag = router.query.tag as string;
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [page, setPage] = useBlogPagination(blogId);
   const [isLoaded, setLoaded] = useState<boolean>(false);
+  const [page, setPage] = useBlogPagination(blogId);
+  const { queryset, maxPage, getPage } = usePaginatedQuery(
+    { blog_id: blogId, page, perPage: 10, tag },
+    API.Article.getArticleByBlog
+  );
   const onPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
+    getPage(value);
   };
+
   useEffect(() => {
-    Request.Article.getArticleByBlog(blogId, { page, tag }).then((res) => {
-      setArticles(res.data.results);
-      setMaxPage(res.data.maxPage);
-      if (!isLoaded) {
-        setLoaded(true);
-      }
-    });
-  }, [page, tag]);
+    if (page > maxPage) {
+      setPage(maxPage);
+      getPage(maxPage);
+    }
+  }, [page, maxPage]);
+
+  useEffect(() => {
+    getPage(page);
+  }, [tag]);
+
   useEffect(() => {
     if (!isLoaded) {
-      return;
+      return setLoaded(true);
+    } else {
+      getPage(page);
     }
-    if (maxPage < page) {
-      setPage(1);
-    }
-  }, [articles, isLoaded]);
+  }, [isLoaded]);
+
   if (errorCode == 404) {
     return <Error statusCode={errorCode} />;
   }
   return (
     <Container>
       <MainTagRenderer tags={tags} />
-      <ArticlesRenderer articles={articles} page={1} />
+      <ArticlesRenderer articles={queryset} page={1} />
       <MyPagination
         page={page}
         onPageChange={onPageChange}

@@ -18,16 +18,16 @@ export function ArticlesRenderer({ articles, page }: ArticleRendererProps) {
       <Box sx={styles.articleBox}>
         {_articles.map((article, idx) => {
           return (
-            <Paper
-              key={idx}
-              sx={styles.articleCon}
-              onClick={() => {
-                router.push(
-                  `/blog/${article.blog_id}/articles/${article.id}/view`
-                );
-              }}
-            >
-              <Typography noWrap sx={styles.articleTitle}>
+            <Paper key={idx} sx={styles.articleCon}>
+              <Typography
+                onClick={() => {
+                  router.push(
+                    `/blog/${article.blog_id}/articles/${article.id}/view`
+                  );
+                }}
+                noWrap
+                sx={styles.articleTitle}
+              >
                 {article.title}
               </Typography>
               <TagRenderer

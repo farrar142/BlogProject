@@ -1,9 +1,11 @@
 from typing import List
+from random import shuffle
 from ninja import NinjaAPI, Schema, Field
 from ninja.renderers import BaseRenderer
 from django.db.models import QuerySet
 from django.db.models import F
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.core.paginator import Paginator
 from articles.models import *
 from base.api_base import MyRenderer
 from base.serializer import to_dict
@@ -31,7 +33,7 @@ def get_all_articles_id(request):
     return Article.objects.filter(deleted_at__isnull=True, status=0).values('id', "blog_id")
 
 
-@articles.get('{blog_id}')
+@articles.get('')
 def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: str = "", context: bool = False):
 
     blog = Blog.objects.filter(pk=blog_id)
@@ -39,10 +41,7 @@ def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: s
         return []
     blog = blog.first()
     articles = Article.objects.filter(
-        blog=blog, deleted_at__isnull=True, status=NORMAL).exclude(
-        tags__name="과제")
-    # Count('comment', filter=Q(comment__deleted_at__isnull=True)))
-    articles = articles.order_by("-reg_date")
+        blog=blog)
     if tag:
         articles = get_hashtag_articles(articles, tag)
     return articles_formatter(articles, page=page, perPage=perPage, context=context)
@@ -117,23 +116,20 @@ def get_article(request, article_id: int):
     return articles_formatter(article, context=True, images=True)
 
 
-@article.post('{article_id}/delete')
+@article.delete('{article_id}')
 def delete_article(request, article_id: int):
     article = Article.objects.filter(pk=article_id).first()
     if article:
         article.delete()
-        return HttpResponse("success")
+        return {"result": True, "message": "삭제에 성공했습니다."}
     else:
-        return HttpResponseBadRequest("failed")
+        return {"result": False, "message": "삭제에 실패했습니다."}
 
 
 @pagination
 def articles_formatter(articles: QuerySet[Article], page=1, perPage=10, order_by="-reg_date", context=False, images=False):
-    try:
-        articles = articles.select_related(
-            'blog').prefetch_related('article_comment', 'tags', 'images')
-    except:
-        pass
+    articles = articles.select_related(
+        'blog').prefetch_related('article_comment', 'tags', 'images').order_by(order_by)
     result_set = []
     for article in articles:
         formatted = article.get_article_info(images=images, context=context)

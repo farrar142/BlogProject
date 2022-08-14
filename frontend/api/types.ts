@@ -1,8 +1,10 @@
 import { MyImageType } from "./../components/blog/article/ImageUploader";
 export type Paginated<T> = {
-  type: string;
+  type: "paginated";
   curPage: number;
   maxPage: number;
+  perPage: number;
+  hasNext: boolean;
   results: T[];
 };
 

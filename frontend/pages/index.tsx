@@ -1,6 +1,7 @@
 import { Button, Container } from "@mui/material";
 import axios from "axios";
 import type { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import API from "../api";
 import { ArticlesRenderer } from "../components/blog/ArticleRenderer";
@@ -10,13 +11,14 @@ import { API_BASE } from "../src/global";
 import { ArticlesType, ArticleType, Tags } from "../types/blog/blogTags";
 const Home = (props: { tags: Tags }) => {
   const { tags } = props;
+  const router = useRouter();
+  const tag = router.query.tag as string;
   const [articles, setArticles] = useState<ArticleType[]>([]);
-  const [userinfo, setuserinfo] = useUserInfo();
   useEffect(() => {
-    API.Article.getArticleByBlog("random", {}).then(({ data }) => {
+    API.Article.getRandomArticle(tag).then(({ data }) => {
       setArticles(data.results);
     });
-  }, []);
+  }, [tag]);
   return (
     <Container sx={styles.mainCon}>
       {/* <Video className="video_components" src={url} /> */}

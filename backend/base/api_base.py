@@ -8,6 +8,7 @@ from functools import wraps
 from django.db.models import *
 from django.db.models import fields
 from ninja.renderers import BaseRenderer
+from django.core.paginator import Paginator
 
 
 # class ConcatSubquery(Subquery):
@@ -48,6 +49,7 @@ class Concat(Aggregate):
             output_field=CharField(),
             **extra)
 
+
 class MyRenderer(BaseRenderer):
     media_type = "application/json"
 
@@ -62,8 +64,7 @@ class MyRenderer(BaseRenderer):
             return json.dumps(converter(data))
         else:
             return json.dumps([])
-        
-        
+
 
 def qs_to_list(query_set):
     return list(map(lambda x: to_dict(x), query_set))
@@ -86,23 +87,25 @@ def pagination(func=None, offset=1, limit=10):
             page = get_int_num_from_kwargs(kwargs, "page", default_num=offset)
             perPage = get_int_num_from_kwargs(
                 kwargs, "perPage", default_num=limit)
-            paginated_qs = qs[(page-1)*perPage:page*perPage]
-            result: QuerySet = cb(paginated_qs, *args, **kwargs)
+            result: QuerySet = cb(qs, *args, **kwargs)
+            paginated = Paginator(result, per_page=perPage)
+            try:
+                paginated_qs = paginated.page(page)
+            except:
+                paginated_qs = []
             qs_len = 0
             try:
                 qs_len = qs.count()
             except:
                 qs_len = len(qs)
-            length = math.ceil(qs_len/perPage)
             return {
                 "type": "paginated",
                 "contentLength": qs_len,
                 "currentLength": len(result),
-                "maxPage": length,
+                "maxPage": paginated.num_pages,
                 "curPage": page,
                 "perPage": perPage,
-                "hasNext": page < length,
-                "results": converter(result),
+                "results": converter(list(paginated_qs)),
             }
         return wrapper
     return decorator(func) if callable(func) else decorator
