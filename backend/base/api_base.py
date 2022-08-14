@@ -98,7 +98,6 @@ def pagination(func=None, offset=1, limit=10):
                 qs_len = qs.count()
             except:
                 qs_len = len(qs)
-            length = math.ceil(qs_len/perPage)
             return {
                 "type": "paginated",
                 "contentLength": qs_len,
