@@ -1,17 +1,21 @@
 import { ArticlesType, ArticleType } from "../types/blog/blogTags";
 import { AxiosResponse } from "axios";
 import client from "./client";
-import { Args, Paginated, PostArticleType } from "./types";
+import { Args, Paginated, PostArticleType, SimpleResponse } from "./types";
 
 const Article = {
-  getArticleByBlog: (
-    blogId: Args,
-    params: {
-      page?: number;
-      tag?: string;
-    }
+  getRandomArticle: (
+    tag?: string
   ): Promise<AxiosResponse<Paginated<ArticleType>>> => {
-    return client.get(`/api/articles/${blogId}`, {
+    return client.get(`/api/articles/random`, { params: { tag } });
+  },
+  getArticleByBlog: (params: {
+    blog_id: Args;
+    page: number;
+    perPage: number;
+    tag?: string;
+  }): Promise<AxiosResponse<Paginated<ArticleType>>> => {
+    return client.get(`/api/articles`, {
       params,
     });
   },
@@ -30,6 +34,12 @@ const Article = {
     return client.post(`/api/article/${articleId}/edit?action=${action}`, {
       ...params,
     });
+  },
+  deleteArticleById: (
+    articleId: number
+  ): Promise<AxiosResponse<SimpleResponse[]>> => {
+    const endpoint = `/api/article/${articleId}`;
+    return client.delete(endpoint);
   },
 };
 export default Article;

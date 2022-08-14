@@ -19,6 +19,7 @@ import { useSysMsg } from "./MySnackBar";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { useDarkMode } from "../src/atoms";
+import API from "../api";
 type MyProps = {
   auth: UserInfo;
 };
@@ -50,12 +51,20 @@ export default function BasicSpeedDial({ auth }: MyProps) {
       icon: <DeleteIcon />,
       name: "Delete",
       auth: 1,
-      func: () => {
+      func: async () => {
         if (window.confirm("정말로 삭제하시겠어요?")) {
-          axios.post(API_BASE + `/api/article/${article_id}/delete`, {
-            token: getCookie("token"),
-          });
-          router.back();
+          const res = await API.Article.deleteArticleById(parseInt(article_id));
+          if (res.data.length >= 1) {
+            const message = res.data[0];
+            if (message.result) {
+              setMsg({ ...message, type: "success" });
+              router.back();
+            } else {
+              setMsg({ ...message, type: "warning" });
+            }
+          } else {
+            setMsg({ type: "error", message: "오류가 발생했습니다" });
+          }
         }
       },
     },

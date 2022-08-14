@@ -14,12 +14,17 @@ load_dotenv()
 # Create your models here.
 
 
+class ArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True, status=0).exclude(tags__name="과제", status=1)
+
+
 class HashTag(models.Model):
     name = models.CharField('해시태그', max_length=20)
 
 
 class Article(TimeMixin):
-    objects = models.Manager()
+    objects = ArticleManager()
     cached = CachedManager(model="article")
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='articles')
