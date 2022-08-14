@@ -1,4 +1,4 @@
-import { MyImageType } from './../components/blog/article/ImageUploader';
+import { MyImageType } from "./../components/blog/article/ImageUploader";
 export type Paginated<T> = {
   type: string;
   curPage: number;
@@ -12,6 +12,11 @@ export type PostArticleType = {
   context: FormDataEntryValue;
   token: FormDataEntryValue;
   images?: MyImageType[];
+};
+
+export type SimpleResponse = {
+  result: any;
+  message: string;
 };
 
 export type Args = number | string | string[] | undefined;

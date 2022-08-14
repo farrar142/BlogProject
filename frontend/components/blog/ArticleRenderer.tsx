@@ -1,5 +1,6 @@
 import { Box, Paper, Typography } from "@mui/material";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { ArticlesType } from "../../types/blog/blogTags";
 import { TagRenderer } from "./TagRenderer";
 type ArticleRendererProps = {
@@ -8,6 +9,7 @@ type ArticleRendererProps = {
 };
 export function ArticlesRenderer({ articles, page }: ArticleRendererProps) {
   // const setSearchTag = props.setSearchTag;
+  const router = useRouter();
   if (articles) {
     const _articles = page
       ? articles.slice((page - 1) * 10, page * 10)
@@ -16,14 +18,18 @@ export function ArticlesRenderer({ articles, page }: ArticleRendererProps) {
       <Box sx={styles.articleBox}>
         {_articles.map((article, idx) => {
           return (
-            <Paper key={idx} sx={styles.articleCon}>
-              <Link
-                href={`/blog/${article.blog_id}/articles/${article.id}/view`}
-              >
-                <Typography noWrap sx={styles.articleTitle}>
-                  {article.title}
-                </Typography>
-              </Link>
+            <Paper
+              key={idx}
+              sx={styles.articleCon}
+              onClick={() => {
+                router.push(
+                  `/blog/${article.blog_id}/articles/${article.id}/view`
+                );
+              }}
+            >
+              <Typography noWrap sx={styles.articleTitle}>
+                {article.title}
+              </Typography>
               <TagRenderer
                 blog_id={article.blog_id}
                 hashtags={article.hashtags}

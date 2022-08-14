@@ -5,7 +5,7 @@ import { API_BASE } from "../global";
 import API from "../../api";
 
 export const checkLogin = () => {
-  return new Promise<boolean | UserInfo>((resolve, reject) => {
+  return new Promise<UserInfo | boolean>((resolve, reject) => {
     try {
       const token = getCookie("token");
       if (!token) {
