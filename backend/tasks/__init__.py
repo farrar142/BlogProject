@@ -9,9 +9,11 @@ from django.template.loader import render_to_string
 @shared_task
 def send_accounts_find_email(email):
     user = get_user_model().objects.filter(email=email)
-    if email:
+    if user.exists():
         target = user.first()
-        template = render_to_string('tasks/idfinder.html', {'target': target})
+        token = target.make_token()
+        template = render_to_string(
+            'tasks/idfinder.html', {'target': target.username, "token": token})
         emailObject = EmailMessage("Blog에서 아이디 찾기 결과", template, to=[email])
         emailObject.content_subtype = "html"
         result = emailObject.send()

@@ -28,11 +28,6 @@ def get_random_articles(request, tag: str = ""):
     return articles_formatter(target, page=1, order_by="?")
 
 
-@articles.get('all/id')
-def get_all_articles_id(request):
-    return Article.objects.filter(deleted_at__isnull=True, status=0).values('id', "blog_id")
-
-
 @articles.get('')
 def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: str = "", context: bool = False):
 

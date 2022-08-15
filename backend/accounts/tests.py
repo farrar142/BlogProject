@@ -105,30 +105,47 @@ class TestSignin(TestCase):
         self.assertEqual(isinstance(user, AnonymousUser), False)
         self.client.authorize(user)  # 이후 위의 과정은 self.auto_login()으로 진행
         # 잘못된 요청
-        resp1 = self.client.post('/auth/update', {"asset": 432})
+        resp1 = self.client.patch('/auth/update', data={"asset": 432})
         self.assertEqual(resp1.status_code, 422)
         # 업데이트 실패
-        resp2 = self.client.post(
-            '/auth/update', {"key": "asset", "value": 432})
-        self.assertEqual(resp2.status_code, 403)
-        # 비밀번호 업데이트 실패
-        resp2 = self.client.post(
-            '/auth/update', {"key": "password", "value": "failed_password"})
+        resp2 = self.client.patch(
+            '/auth/update', data={"key": "asset", "value": 432})
+        resp2_res = resp2.json()
         self.assertEqual(resp2.status_code, 200)
-        user.refresh_from_db()
-        self.assertEqual(user.check_password('success_password'), False)
+        self.assertEqual(resp2_res.get("result"), False)
 
     def test_로그인_후_정보_업데이트_성공(self):
         user = self.auto_login()
         # 닉네임 업데이트 성공
-        resp2 = self.client.post(
-            '/auth/update', {"key": "nickname", "value": "success_case"})
+        resp2 = self.client.patch(
+            '/auth/update', data={"key": "nickname", "value": "success_case"})
         self.assertEqual(resp2.status_code, 200)
         user.refresh_from_db()
         self.assertEqual(user.nickname, "success_case")
         # 비밀번호 업데이트 성공
-        resp2 = self.client.post(
-            '/auth/update', {"key": "password", "value": "success_password"})
+        resp2 = self.client.patch(
+            '/auth/update', data={"key": "password", "value": "success_password"})
         self.assertEqual(resp2.status_code, 200)
         user.refresh_from_db()
         self.assertEqual(user.check_password('success_password'), True)
+
+
+class TestToken(TestCase):
+    def test_인증된_사용자(self):
+        self.auto_login()
+        resp = self.client.post("/auth/expired_test")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_만료된_사용자(self):
+        self.expired_login()
+        resp = self.client.post("/auth/expired_test")
+        self.assertEqual(resp.status_code, 403)
+
+    def test_미인증_사용자(self):
+        resp = self.client.post("/auth/expired_test")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_잘못된_토큰_사용자(self):
+        self.client.not_validated_token()
+        resp = self.client.post("/auth/expired_test")
+        self.assertEqual(resp.status_code, 403)
