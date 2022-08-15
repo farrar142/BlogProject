@@ -1,26 +1,47 @@
-import { Box, Paper, Typography } from "@mui/material";
-import Link from "next/link";
+import React from "react";
+import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { ArticleType } from "../../../types/blog/blogTags";
 import { useRouter } from "next/router";
-import { ArticlesType } from "../../types/blog/blogTags";
-import ArticleItem from "./article/ArticleItem";
-import { TagRenderer } from "./TagRenderer";
-type ArticleRendererProps = {
-  articles: ArticlesType;
-  page: number;
-};
-export function ArticlesRenderer({ articles, page }: ArticleRendererProps) {
-  // const setSearchTag = props.setSearchTag;
-  const _articles = page
-    ? articles.slice((page - 1) * 10, page * 10)
-    : articles;
+import { TagRenderer } from "../TagRenderer";
+
+const ArticleItem: React.FC<{ article: ArticleType }> = ({ article }) => {
+  const router = useRouter();
+  const theme = useTheme();
   return (
-    <Box sx={styles.articleBox}>
-      {_articles.map((article, idx) => {
-        return <ArticleItem key={article.id} article={article} />;
-      })}
-    </Box>
+    <Paper sx={styles.articleCon}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          cursor: "pointer",
+          marginBottom: 1,
+        }}
+        onClick={() => {
+          router.push(`/blog/${article.blog_id}/articles/${article.id}/view`);
+        }}
+      >
+        <Typography
+          sx={{
+            "&:hover": {
+              color: theme.palette.primary.main,
+            },
+          }}
+          noWrap
+        >
+          {article.title}
+        </Typography>
+        <Typography sx={{ marginLeft: 1, letterSpacing: 1 }} color="secondary">
+          [{article.comment_count}]
+        </Typography>
+      </Box>
+      <TagRenderer blog_id={article.blog_id} hashtags={article.hashtags} />
+    </Paper>
   );
-}
+};
+
+export default ArticleItem;
 
 const styles = {
   mainTagCon: {
@@ -74,7 +95,6 @@ const styles = {
     height: "40px",
     textAlign: "center",
     cursor: "pointer",
-    zIndex: 50,
   },
   articleBody: {
     height: "20px",
