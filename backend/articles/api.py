@@ -107,7 +107,7 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
         pass
     else:
         article = None
-    return Article.objects.filter(article.pk)
+    return Article.objects.filter(pk=article.pk)
 
 
 @article.get('{article_id}')
