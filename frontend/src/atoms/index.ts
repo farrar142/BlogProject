@@ -35,41 +35,10 @@ const ssrCompletedState = atom({
   key: "SsrCompleted",
   default: false,
 });
-
-const testStorage = (key: string): Promise<any> => {
-  return new Promise<any>((res, rej) => {
-    setTimeout(() => {
-      res(key);
-    }, 1000);
-  });
-};
-
 const userDataAtom = atom<UserInfo>({
   key: "userDataAtom",
   default: UserInfoDefault,
   effects_UNSTABLE: [persistAtom],
-});
-
-const tokenAtom = atom<string>({
-  key: "token",
-  default: typeof window === "undefined" ? "" : getCookie("token"),
-  effects_UNSTABLE: [persistAtom],
-});
-
-const userInfoSelector = selector<UserInfo>({
-  key: "userInfoSelector",
-  get: async ({ get }) => {
-    const token = get(tokenAtom);
-    if (!token) {
-      return get(userDataAtom);
-    } else {
-      const res = await getUserInfo((e: UserInfo) => {});
-      return res;
-    }
-  },
-  set: ({ set }, newValue) => {
-    set(userDataAtom, newValue);
-  },
 });
 
 export const useUserInfo = (): [UserInfo, (e: UserInfo) => void] => {
