@@ -3,39 +3,42 @@ import { Box, Paper, Typography, useTheme } from "@mui/material";
 import { ArticleType } from "../../../types/blog/blogTags";
 import { useRouter } from "next/router";
 import { TagRenderer } from "../TagRenderer";
+import Link from "next/link";
 
 const ArticleItem: React.FC<{ article: ArticleType }> = ({ article }) => {
   const router = useRouter();
   const theme = useTheme();
   return (
     <Paper sx={styles.articleCon}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          cursor: "pointer",
-          marginBottom: 1,
-        }}
-        onClick={() => {
-          router.push(`/blog/${article.blog_id}/articles/${article.id}/view`);
-        }}
-      >
-        <Typography
+      <Link href={`/blog/${article.blog_id}/articles/${article.id}/view`}>
+        <Box
           sx={{
-            "&:hover": {
-              color: theme.palette.primary.main,
-            },
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            cursor: "pointer",
+            marginBottom: 1,
           }}
-          noWrap
         >
-          {article.title}
-        </Typography>
-        <Typography sx={{ marginLeft: 1, letterSpacing: 1 }} color="secondary">
-          [{article.comment_count}]
-        </Typography>
-      </Box>
+          <Typography
+            sx={{
+              "&:hover": {
+                color: theme.palette.primary.main,
+              },
+            }}
+            noWrap
+          >
+            {article.title}
+          </Typography>
+          <Typography
+            sx={{ marginLeft: 1, letterSpacing: 1 }}
+            color="secondary"
+          >
+            [{article.comment_count}]
+          </Typography>
+        </Box>
+      </Link>
       <TagRenderer blog_id={article.blog_id} hashtags={article.hashtags} />
     </Paper>
   );
