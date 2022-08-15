@@ -18,6 +18,7 @@ const ArticleFinder: React.FC = () => {
   const blogId = router.query.id;
   const [page, setPage] = useState(1);
   const [title, setTitle] = useState("");
+  const [isLoaded, setLoaded] = useState(false);
   const [minimize, setMinimize] = useState(true);
   const [msg, setMsg] = useSysMsg();
   const [coord, setCoord] = useState({ clientX: 500, clientY: 100 });
@@ -61,8 +62,22 @@ const ArticleFinder: React.FC = () => {
   };
 
   useEffect(() => {
-    paginated.getPage(page);
-  }, [page, title]);
+    if (!isLoaded) {
+      return setLoaded(true);
+    }
+    if (page > paginated.maxPage) {
+      setPage(paginated.maxPage);
+      paginated.getPage(paginated.maxPage);
+    }
+  }, [page, paginated.maxPage]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return setLoaded(true);
+    } else {
+      paginated.getPage(page);
+    }
+  }, [isLoaded, title]);
 
   return (
     <Paper
