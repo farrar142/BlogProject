@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useRef, useState, useEffect } from "react";
 import API from "../../../../../api";
+import ArticleFinder from "../../../../../components/blog/article/ArticleFinder";
 import MyImageUploader, {
   MyImageType,
   removeFile,
@@ -221,6 +222,7 @@ const WriteArticle = ({
           </Button>
         </Box>
       </FormControl>
+      <ArticleFinder />
       <MyImageUploader
         discardImages={discardImages}
         setDiscardImages={setDiscardImages}

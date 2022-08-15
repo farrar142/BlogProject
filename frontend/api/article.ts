@@ -14,6 +14,7 @@ const Article = {
     page: number;
     perPage: number;
     tag?: string;
+    title?: string;
   }): Promise<AxiosResponse<Paginated<ArticleType>>> => {
     return client.get(`/api/articles`, {
       params,

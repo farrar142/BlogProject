@@ -1,11 +1,20 @@
-import { Button, Container, FormControl, TextField } from "@mui/material";
+import {
+  Button,
+  Container,
+  FormControl,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
 import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import API from "../../../../api";
+import ArticleFinder from "../../../../components/blog/article/ArticleFinder";
 import AsideNavBar from "../../../../components/blog/article/AsideNavBar";
 import MyImageUploader, {
   MyImageType,
@@ -16,6 +25,8 @@ import { useSysMsg } from "../../../../components/MySnackBar";
 import { useDarkMode } from "../../../../src/atoms";
 import { getCookie } from "../../../../src/functions/cookies";
 import { API_BASE } from "../../../../src/global";
+import { usePaginatedQuery } from "../../../../src/hooks/usePagination";
+import { UserInfo } from "../../../../types/accounts";
 import {
   ArticleType,
   BlogInfoType,
@@ -147,6 +158,7 @@ const WriteArticle = ({ errorCode, blog, tags }: WriteArticleProps) => {
           저장하기
         </Button>
       </FormControl>
+      <ArticleFinder />
       <MyImageUploader
         discardImages={discardImages}
         setDiscardImages={setDiscardImages}
