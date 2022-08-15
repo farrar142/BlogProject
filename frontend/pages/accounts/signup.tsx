@@ -14,24 +14,9 @@ import Router, { useRouter } from "next/router";
 import axios from "axios";
 import { useSysMsg } from "../../components/MySnackBar";
 import API from "../../api";
-
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://soundcloud.com/sandring-443999826">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import Copyright from "../../components/accounts/Copyright";
+import emailValidation from "../../src/validation/EmailValidation";
+import passwordValidation from "../../src/validation/PasswordValidation";
 
 export default function SignUp() {
   const [sysMsg, setMsg] = useSysMsg();
@@ -40,41 +25,14 @@ export default function SignUp() {
   const [password, setPassword] = React.useState("");
   const [password2, setPassword2] = React.useState("");
   const router = useRouter();
-  function validEmailCheck(value: string) {
-    var pattern =
-      /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
-    return value.match(pattern) != null;
-  }
-  const emailValidation = () => {
-    if (email == "") {
-      return false;
-    }
-    if (!validEmailCheck(email)) {
-      return "이메일을 정확하게 입력해주세요";
-    }
-    return false;
-  };
 
-  const passwordValidation = () => {
-    if (password2 == "") {
-      return false;
-    }
-    if (password !== password2) {
-      return "패스워드가 일치하지 않습니다";
-    }
-    if (password.length < 8) {
-      return "비밀번호는 8자 이상 이여야 됩니다.";
-    } else {
-      return false;
-    }
-  };
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!(password === password2)) {
       return setMsg({ type: "warning", message: "정보가 옳바르지 않아요" });
     }
-    const emailValid = emailValidation();
+    const emailValid = emailValidation(email);
     if (emailValid) {
       return setMsg({ type: "warning", message: emailValid });
     }
@@ -105,7 +63,7 @@ export default function SignUp() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign Up
+          회원 가입
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
@@ -122,7 +80,7 @@ export default function SignUp() {
             color="secondary"
           />
           <TextField
-            error={emailValidation() ? true : false}
+            error={emailValidation(email) ? true : false}
             margin="normal"
             required
             fullWidth
@@ -134,10 +92,10 @@ export default function SignUp() {
             color="secondary"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            helperText={emailValidation()}
+            helperText={emailValidation(email)}
           />
           <TextField
-            error={passwordValidation() ? true : false}
+            error={passwordValidation(password, password2) ? true : false}
             margin="normal"
             required
             fullWidth
@@ -149,12 +107,12 @@ export default function SignUp() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
-            helperText={passwordValidation()}
+            helperText={passwordValidation(password, password2)}
             autoComplete="off"
             color="secondary"
           />
           <TextField
-            error={passwordValidation() ? true : false}
+            error={passwordValidation(password, password2) ? true : false}
             margin="normal"
             required
             fullWidth
@@ -162,7 +120,7 @@ export default function SignUp() {
             label="Password2"
             type="password"
             id="password2"
-            helperText={passwordValidation()}
+            helperText={passwordValidation(password, password2)}
             value={password2}
             onChange={(e) => {
               setPassword2(e.target.value);
@@ -177,7 +135,7 @@ export default function SignUp() {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign Up
+            회원가입
           </Button>
           <Button
             color="secondary"
@@ -186,11 +144,11 @@ export default function SignUp() {
             sx={{ mt: 3, mb: 2 }}
             onClick={() => router.back()}
           >
-            Back to Login Page
+            로그인 페이지로
           </Button>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 8, mb: 4 }} />
+      <Copyright sx={{ mb: 4 }} />
     </Container>
   );
 }

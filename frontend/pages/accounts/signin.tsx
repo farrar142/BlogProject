@@ -12,28 +12,12 @@ import Typography from "@mui/material/Typography";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import API from "../../api";
+import Copyright from "../../components/accounts/Copyright";
 import { useSysMsg } from "../../components/MySnackBar";
 import { useUserInfo } from "../../src/atoms";
 import { cipher, decipher } from "../../src/crypto";
 import { deleteCookie, setCookie } from "../../src/functions/cookies";
 import getUserInfo from "../../src/hooks/getUserInfo";
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://soundcloud.com/sandring-443999826">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 type SignIn = { username: string; password: string };
 
 const userDataDefault: SignIn = {
@@ -133,7 +117,7 @@ export default function SignIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          로그인
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
@@ -177,7 +161,7 @@ export default function SignIn() {
                 color="secondary"
               />
             }
-            label="Remember me"
+            label="로그인 정보 기억하기"
             color="secondary"
           />
           <Button
@@ -187,17 +171,17 @@ export default function SignIn() {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign In
+            로그인
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="/accounts/Idfinder" color="secondary">
-                <Typography>Forgot password?</Typography>
+              <Link href="/accounts/idfinder" color="secondary">
+                <Typography>비밀번호를 잊어버리셨나요?</Typography>
               </Link>
             </Grid>
             <Grid item>
               <Link href="/accounts/signup" color="secondary">
-                <Typography>Sign Up</Typography>
+                <Typography>회원가입</Typography>
               </Link>
             </Grid>
           </Grid>

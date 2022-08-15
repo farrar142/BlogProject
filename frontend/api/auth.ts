@@ -1,7 +1,7 @@
 import { ArticlesType, ArticleType } from "../types/blog/blogTags";
 import { AxiosResponse } from "axios";
 import client from "./client";
-import { Args, Paginated, PostArticleType } from "./types";
+import { Args, Paginated, PostArticleType, SimpleResponse } from "./types";
 import { UserInfo } from "../types/accounts";
 
 type SignUpResponse = {
@@ -31,6 +31,17 @@ const Auth = {
   },
   getUserInfo: (): Promise<AxiosResponse<UserInfo>> => {
     return client.post(`/auth/userinfo`);
+  },
+  postIdfind: (form: {
+    email: string;
+  }): Promise<AxiosResponse<SimpleResponse>> => {
+    return client.post(`/auth/idfind`, form);
+  },
+  patchUser: (form: {
+    key: string;
+    value: string;
+  }): Promise<AxiosResponse<SimpleResponse>> => {
+    return client.patch(`/auth/update`, form, { data: form });
   },
 };
 export default Auth;

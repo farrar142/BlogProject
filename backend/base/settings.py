@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'articles',
     'blog',
     'accounts',
+    'django_inlinecss',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

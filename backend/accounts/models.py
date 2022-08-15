@@ -63,9 +63,18 @@ class User(AbstractUser):
             blog_name = blog.name
         resp = to_dict(self)
         resp["blog_id"] = blog_id
-        resp["blog_name"]=blog_name
+        resp["blog_name"] = blog_name
         return resp
 
+    @classmethod
+    def expired_token(cls, pk):
+        payload = {
+            "id": pk,
+            "exp": datetime.datetime.now()+datetime.timedelta(days=-2, hours=-9),
+            'iat': datetime.datetime.now()+datetime.timedelta(hours=-9),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        return token
 
     @classmethod
     def offer_token(cls, pk):

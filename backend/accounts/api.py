@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+from tasks import send_accounts_find_email
 from blog.models import Blog
 
 from base.auth import AuthBearer
@@ -53,6 +54,22 @@ def signin(request, form: UserLoginSchema):
     return HttpResponseForbidden()
 
 
+@auth.post('expired')
+def expired(request, form: UserLoginSchema):
+    user = authenticate(request, **form.dict())
+    if user:
+        return {"token": User.expired_token(user.pk)}
+    return HttpResponseForbidden()
+
+
+@auth.post("expired_test", auth=AuthBearer())
+def expired_test(request):
+    if isinstance(request.auth, AnonymousUser):
+        return HttpResponseForbidden()
+    else:
+        return HttpResponse()
+
+
 class SimpleResponse(Schema):
     status: int
     message: str
@@ -95,7 +112,7 @@ class Change_User(Schema):
     value: str
 
 
-@auth.post('update', auth=AuthBearer(), response=UserOut)
+@auth.patch('update', auth=AuthBearer())
 def update_user(request, form: Change_User):
     auth: User = request.auth
     user = User.objects.filter(pk=auth.pk)
@@ -105,13 +122,27 @@ def update_user(request, form: Change_User):
                 form.value)
             update = {form.key: value}
             user.update(**update)
-            return user.get().get_user_info()
+            return {"result": True, "message": "비밀번호 변경에 성공했습니다."}
         except:
-            return HttpResponseForbidden()
+            return {"result": False, "message": "비밀번호 변경에 실패했습니다."}
     else:
-        return HttpResponseForbidden()
+        return {"result": False, "message": "인증되지 않은 유저입니다"}
 
 
 @auth.post('userinfo', auth=AuthBearer(), response=UserOut)
 def get_user_info(request):
     return request.auth.get_user_info()
+
+
+class EmailForm(Schema):
+    email: str
+
+
+@auth.post("idfind")
+def id_find(request, form: EmailForm):
+    users = User.objects.filter(email=form.email)
+    if (users.exists()):
+        send_accounts_find_email.delay(form.email)
+        return {"result": True, "message": "이메일을 성공적으로 발신했습니다."}
+    else:
+        return {"result": False, "message": "이메일과 맞는 유저를 찾지 못했습니다."}
