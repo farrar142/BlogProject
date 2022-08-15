@@ -17,9 +17,12 @@ export class Storage {
   }
   initializer() {
     if (isClient) {
-      const value = JSON.parse(
-        decipher(localStorage.getItem(this.name) || "false")
-      );
+      let value = {};
+      try {
+        value = JSON.parse(
+          decipher(localStorage.getItem(this.name) || "false")
+        );
+      } catch {}
       if (!value) {
         cipher(JSON.stringify({})).then((value) => {
           localStorage.setItem(this.name, value);
