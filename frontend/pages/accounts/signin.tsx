@@ -37,13 +37,12 @@ const rememberUserData = {
       const { username, password } =
         JSON.parse(localStorage.getItem("userData") || "false") ||
         userDataDefault;
-      decipher(password)
-        .then((res) => {
-          resolve({ username, password: res });
-        })
-        .catch(() => {
-          resolve(userDataDefault);
-        });
+      const res = decipher(password);
+      if (res) {
+        resolve({ username, password: res });
+      } else {
+        resolve(userDataDefault);
+      }
     });
   },
   setUserData: ({ username, password }: typeof userDataDefault) => {

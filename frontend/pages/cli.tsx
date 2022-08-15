@@ -405,8 +405,8 @@ const CliComp: NextPage = () => {
             required
             sx={styles.inputBar}
             id="outlined-required1"
-            label="hostnamename"
-            name="hostnamename"
+            label="hostname"
+            name="hostname"
             onChange={hostnameHandler}
             value={hostname}
             placeholder="IP Address"
@@ -427,7 +427,7 @@ const CliComp: NextPage = () => {
             required
             sx={styles.inputBar}
             id="outlined-password-input"
-            label="HOSTname PASSWORD"
+            label="PASSWORD"
             type="password"
             name="password"
             value={password}
@@ -439,7 +439,7 @@ const CliComp: NextPage = () => {
               size="small"
               sx={styles.inputBar}
               id="outlined-read-only-input"
-              label="HOSTname PATH"
+              label="PATH"
               value={path}
               onChange={inputPathHandler}
               // InputProps={{

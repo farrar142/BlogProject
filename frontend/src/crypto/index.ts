@@ -1,7 +1,7 @@
 import crypto from "crypto";
 const key = process.env.NEXT_PUBLIC_PASSWORD_CRYPTO_KEY || "whatyouwant";
 
-export const cipher = (password: string) => {
+export const cipher = (password: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const encrypt = crypto.createCipher("des", key);
     const encryptResult =
@@ -11,11 +11,13 @@ export const cipher = (password: string) => {
 };
 
 export const decipher = (password: string) => {
-  return new Promise<string>((resolve, reject) => {
+  try {
     const decode = crypto.createDecipher("des", key);
     const decodeResult =
       decode.update(password, "base64", "utf8") + decode.final("utf8"); //
 
-    resolve(decodeResult);
-  });
+    return decodeResult;
+  } catch {
+    return "";
+  }
 };

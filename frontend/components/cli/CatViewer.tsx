@@ -15,6 +15,8 @@ import {
   TextField,
   Box,
   Tooltip,
+  TextareaAutosize,
+  useTheme,
 } from "@mui/material";
 import { text } from "stream/consumers";
 type CatViewerProps = {
@@ -29,20 +31,20 @@ type CatViewerProps = {
   mV: (e: string, v: string) => void;
   infoPathOpen: boolean;
 };
-export const CatViewer = (props: CatViewerProps) => {
+export const CatViewer: React.FC<CatViewerProps> = ({
+  context,
+  sourceFile,
+  modifyFile,
+  viewerWidth,
+  setSourceFile,
+  edit,
+  setEdit,
+  infoPathOpen,
+  cP,
+  mV,
+}) => {
+  const theme = useTheme();
   let re = /\r\n/g;
-  const {
-    context,
-    sourceFile,
-    modifyFile,
-    viewerWidth,
-    setSourceFile,
-    edit,
-    setEdit,
-    infoPathOpen,
-    cP,
-    mV,
-  } = props;
   const [tabLength, setTabLength] = useState(4);
   const [targetFile, setTargetFile] = useState("");
   const textRef = useRef<HTMLTextAreaElement | null>(null);
@@ -178,13 +180,18 @@ export const CatViewer = (props: CatViewerProps) => {
           </Box>
         </Tooltip>
       </Box>
-      <textarea
-        style={{ padding: 0, margin: 0 }}
+      <TextareaAutosize
+        style={{
+          padding: 0,
+          margin: 0,
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}
         ref={textRef}
         name="textarea"
         id=""
         cols={30}
-        rows={10}
+        minRows={30}
         defaultValue={edit ? edit : context}
         onChange={(e) => {
           if (e.currentTarget) {
@@ -195,7 +202,7 @@ export const CatViewer = (props: CatViewerProps) => {
           }
         }}
         onKeyDown={handleSetTab}
-      ></textarea>
+      ></TextareaAutosize>
       <Tooltip title="소스파일을 수정합니다.">
         <Button
           sx={styles.modifyButton}

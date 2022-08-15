@@ -1,6 +1,7 @@
-import React from 'react';
+import React from "react";
+import { cipher, decipher } from "../crypto";
 
-const isClient = typeof window !== 'undefined';
+const isClient = typeof window !== "undefined";
 type StorageType = {
   [key: string]: string;
 };
@@ -11,17 +12,21 @@ export class Storage {
   constructor(name: string) {
     this.name = name;
     this.obj = {};
-    this.str = '';
+    this.str = "";
     this.initializer();
   }
   initializer() {
     if (isClient) {
-      const value = localStorage.getItem(this.name);
+      const value = JSON.parse(
+        decipher(localStorage.getItem(this.name) || "false")
+      );
       if (!value) {
-        localStorage.setItem(this.name, JSON.stringify({}));
+        cipher(JSON.stringify({})).then((value) => {
+          localStorage.setItem(this.name, value);
+        });
         this.obj = {};
       } else {
-        this.obj = JSON.parse(value);
+        this.obj = value;
       }
     } else {
       this.obj = {};
@@ -50,7 +55,9 @@ export class Storage {
     this.save();
   }
   save() {
-    localStorage.setItem(this.name, JSON.stringify(this.obj));
+    cipher(JSON.stringify(this.obj)).then((value) => {
+      localStorage.setItem(this.name, value);
+    });
   }
 }
 export interface CreateStoreReturnValue<T> {
@@ -66,7 +73,7 @@ export const createStore = <T = any>({
   key,
   defaultValue,
 }: StoreProps): CreateStoreReturnValue<T> => {
-  const storage = new Storage('myState');
+  const storage = new Storage("myState");
   let value: any;
   let persistValue = isClient ? storage.get(key) : false;
   if (!persistValue) {
@@ -107,8 +114,8 @@ export const useGlobalStore = <T = any>(
   return [value, store.setValue];
 };
 export const myFirstAtom = createStore({
-  key: 'shutthuefuckup',
-  defaultValue: '',
+  key: "shutthuefuckup",
+  defaultValue: "",
 });
 export const useShut = (): [string, (e: string) => void] => {
   const [getter, setter] = useGlobalStore<string>(myFirstAtom);
@@ -127,15 +134,15 @@ type ConfigType = {
   cmd: string;
 };
 const defaultConfig = {
-  path: '/',
-  hostname: 'server',
-  user: 'root',
-  port: '22',
-  password: '',
-  cmd: '',
+  path: "/",
+  hostname: "server",
+  user: "root",
+  port: "22",
+  password: "",
+  cmd: "",
 };
 export const configAtom = createStore({
-  key: 'configAtom',
+  key: "configAtom",
   defaultValue: defaultConfig,
 });
 export const useConfig = () => {
