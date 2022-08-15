@@ -29,14 +29,19 @@ def get_random_articles(request, tag: str = ""):
 
 
 @articles.get('')
-def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: str = "", context: bool = False):
+def get_articles(request, blog_id: int, page: int = 1, perPage: int = 10, tag: str = "", title: str = "", last_id: int = 0, context: bool = False):
 
     blog = Blog.objects.filter(pk=blog_id)
     if not blog:
         return []
     blog = blog.first()
+    filter = {"blog": blog}
+    if title:
+        filter.update(title__icontains=title)
+    if last_id:
+        filter.update(id__lt=last_id)
     articles = Article.objects.filter(
-        blog=blog)
+        **filter)
     if tag:
         articles = get_hashtag_articles(articles, tag)
     return articles_formatter(articles, page=page, perPage=perPage, context=context)
