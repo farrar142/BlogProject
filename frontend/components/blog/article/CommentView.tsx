@@ -17,7 +17,7 @@ import axios from "axios";
 import { useDarkMode, useUserInfo } from "../../../src/atoms";
 import { API_BASE } from "../../../src/global";
 import { CommentUpserArgs } from "../../../api/comment";
-import { checkLogin } from "../../../src/hooks/getUserInfo";
+import { checkLogin } from "../../../src/hooks/useSetUserInfo";
 import API from "../../../api";
 import { useSysMsg } from "../../MySnackBar";
 import { UserInfo } from "../../../types/accounts";
