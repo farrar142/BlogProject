@@ -169,21 +169,21 @@ export default function SignIn() {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 2, fontWeight: "bold" }}
           >
             로그인
           </Button>
           <Button
-            color="secondary"
+            color="kakao"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 2, color: "#000", fontWeight: "bold" }}
             onClick={async () => {
               const res = await API.Auth.kakaoLogin();
               router.push(res.data.url);
             }}
           >
-            로그인
+            카카오 로그인
           </Button>
           <Grid container>
             <Grid item xs>
