@@ -1,4 +1,4 @@
-import getUserInfo, { UserInfoDefault } from "./../hooks/getUserInfo";
+import useSetUserInfo, { UserInfoDefault } from "./../hooks/useSetUserInfo";
 import { useEffect } from "react";
 
 import {

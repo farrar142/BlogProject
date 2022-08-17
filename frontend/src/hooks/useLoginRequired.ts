@@ -5,7 +5,7 @@ import Router from "next/router";
 import { useEffect, useState } from "react";
 import { useSsrComplectedState } from "../atoms";
 import { deleteCookie, getCookie } from "../functions/cookies";
-import { checkLogin } from "./getUserInfo";
+import { checkLogin } from "./useSetUserInfo";
 
 export const useLoginRequired = (paths: string[]): void => {
   const ssrCompleted = useSsrComplectedState();

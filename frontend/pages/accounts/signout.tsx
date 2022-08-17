@@ -7,7 +7,9 @@ import {
   getCookie,
   setCookie,
 } from "../../src/functions/cookies";
-import getUserInfo, { UserInfoDefault } from "../../src/hooks/getUserInfo";
+import useSetUserInfo, {
+  UserInfoDefault,
+} from "../../src/hooks/useSetUserInfo";
 import { UserInfo } from "../../types/accounts";
 
 const Signout = () => {

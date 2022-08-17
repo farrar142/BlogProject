@@ -1,8 +1,9 @@
-import { UserInfo } from "./../../types/accounts/index";
+import { UserInfo } from "../../types/accounts/index";
 import axios from "axios";
 import { getCookie } from "../functions/cookies";
 import { API_BASE } from "../global";
 import API from "../../api";
+import { useUserInfo } from "../atoms";
 
 export const checkLogin = () => {
   return new Promise<UserInfo | boolean>((resolve, reject) => {
@@ -21,15 +22,18 @@ export const checkLogin = () => {
   });
 };
 
-const getUserInfo = async (handler: (e: UserInfo) => void) => {
-  const res = await checkLogin();
-  if (res && typeof res !== "boolean") {
-    handler(res);
-    return res;
-  } else {
-    handler(UserInfoDefault);
-    return UserInfoDefault;
-  }
+const useSetUserInfo = () => {
+  const [user, setUser] = useUserInfo();
+  return async () => {
+    const res = await checkLogin();
+    if (res && typeof res !== "boolean") {
+      setUser(res);
+      return res;
+    } else {
+      setUser(UserInfoDefault);
+      return UserInfoDefault;
+    }
+  };
 };
 export const UserInfoDefault = {
   username: "",
@@ -39,4 +43,4 @@ export const UserInfoDefault = {
   blog_name: "",
   profile_url: "",
 };
-export default getUserInfo;
+export default useSetUserInfo;

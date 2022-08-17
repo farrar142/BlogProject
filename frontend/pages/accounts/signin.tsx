@@ -17,7 +17,7 @@ import { useSysMsg } from "../../components/MySnackBar";
 import { useUserInfo } from "../../src/atoms";
 import { cipher, decipher } from "../../src/crypto";
 import { deleteCookie, setCookie } from "../../src/functions/cookies";
-import getUserInfo from "../../src/hooks/getUserInfo";
+import useSetUserInfo from "../../src/hooks/useSetUserInfo";
 type SignIn = { username: string; password: string };
 
 const userDataDefault: SignIn = {
@@ -59,10 +59,11 @@ export default function SignIn() {
   //Login
   const [msg, setMsg] = useSysMsg();
   const router = useRouter();
-  const [userInfo, setUserInfo] = useUserInfo();
+  const [userInfo] = useUserInfo();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const setUserInfo = useSetUserInfo();
 
   useEffect(() => {
     const isRemember = rememberUserData.getIsRemember();
@@ -92,7 +93,7 @@ export default function SignIn() {
       deleteCookie("token");
       const token = res.data.token;
       setCookie("token", token);
-      getUserInfo(setUserInfo).then((res) => {
+      setUserInfo().then((res) => {
         router.back();
       });
       setMsg({ type: "success", message: "로그인되었습니다!" });
@@ -169,6 +170,18 @@ export default function SignIn() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+          >
+            로그인
+          </Button>
+          <Button
+            color="secondary"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            onClick={async () => {
+              const res = await API.Auth.kakaoLogin();
+              router.push(res.data.url);
+            }}
           >
             로그인
           </Button>

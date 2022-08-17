@@ -17,6 +17,9 @@ def get_default_nickname(instance):
 
 
 class User(AbstractUser):
+    class ProviderTypeCodeChoices(models.TextChoices):
+        LOCAL = "local", "로컬"
+        KAKAO = "kakao", "카카오"
     """
     패스워드는 상속
     """
@@ -37,6 +40,10 @@ class User(AbstractUser):
     )
     email = models.EmailField('이메일')
     profile_url = models.CharField(max_length=256, null=True, blank=True)
+
+    provider_type_code = models.CharField(
+        '프로바이더 타입코드', max_length=20, choices=ProviderTypeCodeChoices.choices, default=ProviderTypeCodeChoices.LOCAL)
+    provider_accounts_id = models.PositiveIntegerField('프로바이더 회원번호', default=0)
 
     @classmethod
     def create(cls, username: str, email: str, password: str):
@@ -94,3 +101,21 @@ class User(AbstractUser):
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         return token
+
+    @staticmethod
+    def login_with_kakao(request, provider_accounts_id):
+        provider_type_code = User.ProviderTypeCodeChoices.KAKAO
+        qs: QuerySet = User.objects.filter(provider_type_code=provider_type_code,
+                                           provider_accounts_id=provider_accounts_id)
+
+        if not qs.exists():
+            username = provider_type_code + "__" + str(provider_accounts_id)
+            name = provider_type_code + "__" + str(provider_accounts_id)
+            email = ""
+            password = ""
+            user: User = User.objects.create(username=username, email=email, password=password,
+                                             nickname=name,
+                                             provider_type_code=provider_type_code,
+                                             provider_accounts_id=provider_accounts_id)
+        else:
+            user: User = qs.first()

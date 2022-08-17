@@ -22,6 +22,10 @@ type SignInResponse = {
   token: string;
 };
 
+type ThirdPartRequestParams = {
+  code: string;
+};
+
 const Auth = {
   signUp: (params: SignUpParams): Promise<AxiosResponse<SignUpResponse>> => {
     return client.post<SignUpResponse>(`/auth/signup`, params);
@@ -42,6 +46,14 @@ const Auth = {
     value: string;
   }): Promise<AxiosResponse<SimpleResponse>> => {
     return client.patch(`/auth/update`, form, { data: form });
+  },
+  kakaoLogin: (): Promise<AxiosResponse<{ url: string }>> => {
+    return client.get(`/auth/kakao/login`);
+  },
+  kakaoCallback: (
+    params: ThirdPartRequestParams
+  ): Promise<AxiosResponse<SignInResponse>> => {
+    return client.post(`/auth/kakao/callback`, params);
   },
 };
 export default Auth;

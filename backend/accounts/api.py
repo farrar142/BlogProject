@@ -1,4 +1,6 @@
 import datetime
+import os
+import requests
 from typing import List
 from tasks import send_accounts_find_email
 from blog.models import Blog
@@ -14,8 +16,10 @@ from django.http import *
 from django.shortcuts import get_object_or_404
 from jose import jwt
 from ninja import ModelSchema, NinjaAPI, Schema
-
+from dotenv import load_dotenv
 from accounts.models import User
+
+load_dotenv()
 
 auth = NinjaAPI(urls_namespace="auth", csrf=False, version="1.01")
 
@@ -146,3 +150,51 @@ def id_find(request, form: EmailForm):
         return {"result": True, "message": "이메일을 성공적으로 발신했습니다."}
     else:
         return {"result": False, "message": "이메일과 맞는 유저를 찾지 못했습니다."}
+
+
+@auth.get("kakao/login")
+def Kakao_login(request: HttpRequest):
+    REST_API_KEY = os.environ.get("KAKAO__REST_API_KEY")
+    REDIRECT_URI = os.environ.get("KAKAO__LOGIN_REDIRECT_URI")
+    next_url = request.GET.get('next')
+    kakao_auth_api = "https://kauth.kakao.com/oauth/authorize?"
+    return {"url":
+            f"{kakao_auth_api}client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code"
+            }
+
+
+class KakaoCallback(Schema):
+    code: str
+
+
+@auth.post("kakao/callback")
+def Kakao_login_callback(request, form: KakaoCallback):
+    code = form.code
+    print(code)
+    REST_API_KEY = os.environ.get("KAKAO__REST_API_KEY")
+    REDIRECT_URI = os.environ.get("WAITING_HOW__LOGIN_REDIRECT_URI")
+    token_request = requests.get(
+        f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&code={code}"
+    )
+    "&redirect_uri={REDIRECT_URI}"
+
+    token_json = token_request.json()
+
+    error = token_json.get("error", None)
+    print(error)
+    if error is not None:
+        raise Exception('카카오 로그인 에러')
+
+    access_token = token_json.get("access_token")
+
+    profile_request = requests.get(
+        "https://kapi.kakao.com/v2/user/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    profile_json = profile_request.json()
+
+    id = profile_json.get("id")
+
+    User.login_with_kakao(request, id)
+    user: User = User.objects.get(provider_accounts_id=id)
+    return {"token": user.make_token()}
