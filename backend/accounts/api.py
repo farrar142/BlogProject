@@ -179,7 +179,7 @@ def Kakao_login_callback(request, form: KakaoCallback):
     "&redirect_uri={REDIRECT_URI}"
     print(token_request)
     token_json = token_request.json()
-
+    print(token_json)
     error = token_json.get("error", None)
     print(error)
     if error is not None:
