@@ -177,7 +177,7 @@ def Kakao_login_callback(request, form: KakaoCallback):
         f"https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={REST_API_KEY}&code={code}"
     )
     "&redirect_uri={REDIRECT_URI}"
-
+    print(token_request)
     token_json = token_request.json()
 
     error = token_json.get("error", None)
