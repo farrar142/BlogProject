@@ -13,6 +13,7 @@ const Kakao: NextPage = () => {
     if (router.query.code) {
       const code = router.query.code as string;
       API.Auth.kakaoCallback({ code }).then((res) => {
+        console.log(res);
         setCookie("token", res.data.token);
         setUserInfo().then((res) => {
           router.push("/");

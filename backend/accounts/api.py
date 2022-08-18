@@ -183,7 +183,7 @@ def Kakao_login_callback(request, form: KakaoCallback):
     error = token_json.get("error", None)
     print(error)
     if error is not None:
-        raise Exception('카카오 로그인 에러')
+        return HttpResponseBadRequest({"token": token_json})
 
     access_token = token_json.get("access_token")
 

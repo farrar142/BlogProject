@@ -17,13 +17,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Todo',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(default=None, null=True, verbose_name='삭제일')),
-                ('status', models.PositiveIntegerField(default=0, verbose_name='상태코드')),
-                ('reg_date', models.DateTimeField(auto_now_add=True, verbose_name='등록날짜')),
-                ('update_date', models.DateTimeField(auto_now=True, null=True, verbose_name='수정날짜')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('deleted_at', models.DateTimeField(
+                    default=None, null=True, verbose_name='삭제일')),
+                ('status', models.PositiveIntegerField(
+                    default=0, verbose_name='상태코드')),
+                ('reg_date', models.DateTimeField(
+                    auto_now_add=True, verbose_name='등록날짜')),
+                ('update_date', models.DateTimeField(
+                    auto_now=True, null=True, verbose_name='수정날짜')),
                 ('context', models.CharField(max_length=50, verbose_name='할일')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='todo', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='todo', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
@@ -32,13 +38,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Blog',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(default=None, null=True, verbose_name='삭제일')),
-                ('status', models.PositiveIntegerField(default=0, verbose_name='상태코드')),
-                ('reg_date', models.DateTimeField(auto_now_add=True, verbose_name='등록날짜')),
-                ('update_date', models.DateTimeField(auto_now=True, null=True, verbose_name='수정날짜')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('deleted_at', models.DateTimeField(
+                    default=None, null=True, verbose_name='삭제일')),
+                ('status', models.PositiveIntegerField(
+                    default=0, verbose_name='상태코드')),
+                ('reg_date', models.DateTimeField(
+                    auto_now_add=True, verbose_name='등록날짜')),
+                ('update_date', models.DateTimeField(
+                    auto_now=True, null=True, verbose_name='수정날짜')),
                 ('name', models.CharField(max_length=50, verbose_name='블로그이름')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='blog', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='blog', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
