@@ -2,94 +2,82 @@ import React from "react";
 import { cipher, decipher } from "../crypto";
 
 const isClient = typeof window !== "undefined";
-type StorageType = {
-  [key: string]: string;
-};
-export class Storage {
+export type StorageType = "CliInfo";
+interface StorageInterface<T> {
+  parser: () => T;
+  save: (e: T) => void;
+  set: (value: T) => void;
+  get: () => T;
+}
+/**
+ * object => JSON.stringify()=>암호화=>저장
+ * 불러오기=> 복호화 => JSON.parse()=>object
+ */
+
+class Storage<T> implements StorageInterface<T> {
+  obj: T;
   name: string;
-  obj: StorageType;
-  str: string;
-  constructor(name: string) {
+  constructor(name: string, defaultOptions: T) {
+    this.obj = defaultOptions;
     this.name = name;
-    this.obj = {};
-    this.str = "";
-    this.initializer();
   }
-  initializer() {
-    if (isClient) {
-      let value = {};
-      try {
-        value = JSON.parse(
-          decipher(localStorage.getItem(this.name) || "false")
-        );
-      } catch {}
-      if (!value) {
-        cipher(JSON.stringify({})).then((value) => {
-          localStorage.setItem(this.name, value);
-        });
-        this.obj = {};
-      } else {
-        this.obj = value;
+  parser() {
+    const value = localStorage.getItem(this.name);
+    if (value) {
+      const crypted = decipher(value);
+      const decrypted: T = JSON.parse(crypted);
+      console.log("decrypted", decrypted);
+      for (let key in this.obj) {
+        if (decrypted[key] == null || decrypted[key] == undefined) {
+          decrypted[key] = this.obj[key];
+        }
       }
+      return decrypted;
     } else {
-      this.obj = {};
+      return this.obj;
     }
   }
-  set(key: string, value: any) {
-    // this.initializer();
-    this.obj = { ...this.obj, [key]: value };
-    this.save();
+  save(value: T) {
+    const stringify = JSON.stringify(value);
+    cipher(stringify).then((res) => localStorage.setItem(this.name, res));
   }
-  get(key: string) {
-    // this.initializer();
-    return this.obj[key];
+  get() {
+    return this.parser();
   }
-  del(key: string) {
-    // this.initializer();
-    let tmp = {};
-    for (let i in this.obj) {
-      if (i !== key) {
-        tmp = { ...tmp, [i]: this.obj[i] };
-      } else {
-        tmp = { ...tmp, [i]: null };
-      }
-    }
-    this.obj = tmp;
-    this.save();
-  }
-  save() {
-    cipher(JSON.stringify(this.obj)).then((value) => {
-      localStorage.setItem(this.name, value);
-    });
+  set(value: T) {
+    this.save(value);
   }
 }
+
 export interface CreateStoreReturnValue<T> {
   getValue: () => T;
   setValue: (nextValue: T) => void;
   onChange: (callback: (newValue: T) => void) => void;
 }
-interface StoreProps {
+interface StoreProps<T> {
   key: string;
-  defaultValue: any;
+  defaultValue: T;
 }
-export const createStore = <T = any>({
+export function createStore<T>({
   key,
   defaultValue,
-}: StoreProps): CreateStoreReturnValue<T> => {
-  const storage = new Storage("myState");
-  let value: any;
-  let persistValue = isClient ? storage.get(key) : false;
+}: StoreProps<T>): CreateStoreReturnValue<T> {
+  const storage = new Storage(key, defaultValue);
+  let value: T;
+  console.log(isClient);
+  let persistValue = isClient ? storage.get() : false;
+  console.log(persistValue);
   if (!persistValue) {
     value = defaultValue;
   } else {
-    isClient && storage.set(key, persistValue);
+    isClient && storage.set(persistValue);
     value = persistValue;
   }
   const callbackList: Array<(newValue: T) => void> = [];
   const getValue = () => value;
   const setValue = (newValue: T) => {
     value = newValue;
-    storage.set(key, newValue);
+    storage.set(newValue);
     callbackList.forEach((callback) => callback(newValue));
   };
   const onChange = (callback: (newValue: any) => void) => {
@@ -101,7 +89,7 @@ export const createStore = <T = any>({
   };
 
   return { getValue, setValue, onChange };
-};
+}
 type GlobalStoreReturnValue<T> = [T, (e: T) => void];
 
 export const useGlobalStore = <T = any>(
@@ -116,17 +104,7 @@ export const useGlobalStore = <T = any>(
   }, [store]);
   return [value, store.setValue];
 };
-export const myFirstAtom = createStore({
-  key: "shutthuefuckup",
-  defaultValue: "",
-});
-export const useShut = (): [string, (e: string) => void] => {
-  const [getter, setter] = useGlobalStore<string>(myFirstAtom);
-  const handler = (e: string) => {
-    setter(e);
-  };
-  return [getter, handler];
-};
+
 type ConfigType = {
   path: string;
   hostname: string;
@@ -142,14 +120,20 @@ const defaultConfig = {
   user: "root",
   port: "22",
   password: "",
+  directory: "/",
   cmd: "",
 };
 export const configAtom = createStore({
-  key: "configAtom",
+  key: "CliInfo",
   defaultValue: defaultConfig,
 });
-export const useConfig = () => {
+export const useConfig = <K extends keyof ConfigType>() => {
   const [getter, setter] = useGlobalStore<ConfigType>(configAtom);
+
+  function set(e: K, value: ConfigType[K]) {
+    setter({ ...getter, [e]: value });
+  }
+
   function setPath(e: string) {
     setter({ ...getter, path: e });
   }
@@ -170,6 +154,7 @@ export const useConfig = () => {
   }
   return {
     getter,
+    set,
     setPath,
     setHostname,
     setUser,
