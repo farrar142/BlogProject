@@ -1,4 +1,4 @@
-import { MyImageType } from "./../../components/blog/article/ImageUploader";
+import { MyImageType } from './../../components/blog/article/ImageUploader';
 export type ArticleComment = {
   id: number;
   deleted_at: string | null;
@@ -24,6 +24,7 @@ export type ArticleType = {
   title: string;
   hashtags: Tag[];
   comment_count: number;
+  hits: number;
 };
 export type ArticleViewType = {
   id: number;

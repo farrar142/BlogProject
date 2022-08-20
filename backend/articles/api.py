@@ -112,8 +112,11 @@ def editArticle(request, articleId: int, form: ArticleForm, action: str = "write
 
 @article.get('{article_id}')
 def get_article(request, article_id: int):
-    article = Article.cached.filter(article_id)
-    return articles_formatter(article, context=True, images=True)
+    articles:QuerySet[Article] = Article.cached.filter(article_id)
+    for article in articles:
+        article.increase_hits(request)
+    
+    return articles_formatter(articles, context=True, images=True)
 
 
 @article.delete('{article_id}')

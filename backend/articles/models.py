@@ -1,8 +1,11 @@
 import os
+from typing import Any
 from django.db import models
 from django.urls import reverse
+from django.http import *
 import requests
 from accounts.models import User
+from base.utils import import_token_from_request,get_user_from_token
 from base.api_base import qs_to_list
 from base.serializer import to_dict
 from blog.models import Blog
@@ -34,6 +37,7 @@ class Article(TimeMixin):
     context = models.TextField('내용')
     tags = models.ManyToManyField(HashTag, related_name="articles", blank=True)
     status = models.SmallIntegerField('상태', default=0, null=True, blank=True)
+    hits = models.PositiveIntegerField('조회수',default=0)
 
     @classmethod
     def create(cls, user: User, blog: Blog, title: str, context: str):
@@ -76,9 +80,24 @@ class Article(TimeMixin):
             dictmodel.pop("context")
         return dictmodel
 
+    def increase_hits(self,request:HttpRequest):
+        try:
+            token = import_token_from_request(request)
+            user = get_user_from_token(token)
+            if user.pk != self.user.pk:
+                self.hits += 1
+                self.save()
+        except:
+            self.hits += 1
+            self.save()
+        
+
     def __str__(self):
         return self.title
 
+def debug(e:Any):
+    print(dir(e))
+    print(e)
 
 class Image(models.Model):
     object_id = models.IntegerField('버켓오브젝트ID')

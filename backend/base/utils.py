@@ -1,6 +1,15 @@
+from datetime import datetime
+from typing import TypedDict
 from django.core.cache import cache
+from django.http import *
+from accounts.models import User
+from base.settings import SECRET_KEY
+from jose import jwt
 
-
+class Token(TypedDict):
+    id:int
+    exp:datetime
+    iat:datetime
 class useCache:
     def __init__(self, model: str):
         self.model = model
@@ -39,3 +48,21 @@ class useCache:
     def delete(self):
         cache.delete(self.model)
         return cache.get(self.model)
+
+
+
+def parse_token(str_token:str):
+    token:Token= jwt.decode(str_token, SECRET_KEY, algorithms="HS256")
+    return token
+
+def get_user_from_token(parsed_token:Token):
+    user:User= User.objects.filter(pk=parsed_token["id"]).get()
+    return user
+
+def import_token_from_request(request:HttpRequest):
+    token =request.headers.get("Authorization")
+    if token:
+        token = token.split(" ")[1]
+        return parse_token(token)
+    else:
+        raise Exception("invalid token")

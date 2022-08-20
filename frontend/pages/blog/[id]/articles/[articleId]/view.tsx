@@ -1,78 +1,102 @@
-import { Box, Container, Typography } from "@mui/material";
-import axios from "axios";
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
-import dynamic from "next/dynamic";
-import Error from "next/error";
-import { useRouter } from "next/router";
-import { useRef } from "react";
-import Request from "../../../../../api";
-import AsideNavBar from "../../../../../components/blog/article/AsideNavBar";
-import CommentView from "../../../../../components/blog/article/CommentView";
-import { TagRenderer } from "../../../../../components/blog/TagRenderer";
-import { useDarkMode } from "../../../../../src/atoms";
-import { API_BASE } from "../../../../../src/global";
+import { Box, Container, Typography } from '@mui/material';
+import axios from 'axios';
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import dynamic from 'next/dynamic';
+import Error from 'next/error';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
+import Request from '../../../../../api';
+import AsideNavBar from '../../../../../components/blog/article/AsideNavBar';
+import CommentView from '../../../../../components/blog/article/CommentView';
+import { TagRenderer } from '../../../../../components/blog/TagRenderer';
+import { useDarkMode } from '../../../../../src/atoms';
+import { API_BASE } from '../../../../../src/global';
 import {
   ArticleComment,
   ArticleType,
   ArticleViewType,
   BlogInfoType,
-} from "../../../../../types/blog/blogTags";
+} from '../../../../../types/blog/blogTags';
 
 const ToastViewer = dynamic(
-  () => import("../../../../../components/blog/article/ArticleViewer"),
+  () => import('../../../../../components/blog/article/ArticleViewer'),
   {
     ssr: false,
   }
 );
 
 const ToastViewerDark = dynamic(
-  () => import("../../../../../components/blog/article/ArticleViewerDark"),
+  () => import('../../../../../components/blog/article/ArticleViewerDark'),
   {
     ssr: false,
   }
 );
 type ArticleViewPageProps = {
-  article: ArticleViewType;
+  // article: ArticleViewType;
   blog: BlogInfoType;
   errorCode: number | boolean;
   comments: ArticleComment[];
 };
 const ArticleViewPage = ({
   errorCode,
-  article,
+  // article,
   blog,
   comments,
 }: ArticleViewPageProps) => {
+  const [article, setArticle] = useState<ArticleType | null>(null);
+  const [isLoaded, setLoaded] = useState(false);
   const router = useRouter();
   const viewerRef = useRef(null);
   const [isDark, setDark] = useDarkMode();
+  console.log(article);
+  useEffect(() => {
+    if (!router.query.articleId) {
+      return;
+    }
+    Request.Article.getArticleById(router.query.articleId as string).then(
+      ({ data: { results } }) => {
+        if (results.length >= 1) {
+          setArticle(results[0]);
+        }
+        setLoaded(true);
+      }
+    );
+  }, []);
+
+  if (!isLoaded && !article) {
+    return <Box>로딩중입니다</Box>;
+  }
+
   if (errorCode == 404) {
     return <Error statusCode={errorCode} />;
+  }
+  if (isLoaded && !article) {
+    return <Error statusCode={404} />;
   }
   return (
     <Container
       maxWidth={false}
       sx={styles.articleCon}
-      className="ViewerContainer"
+      className='ViewerContainer'
     >
       <Container sx={styles.emptyCon}>
         <div></div>
       </Container>
       <Container sx={styles.innerCon}>
         <Typography
-          component="h1"
-          variant="h3"
-          color="inherit"
+          component='h1'
+          variant='h3'
+          color='inherit'
           gutterBottom
-          textAlign={"center"}
+          textAlign={'center'}
         >
           {article.title}
         </Typography>
         <TagRenderer blog_id={article.blog_id} hashtags={article.hashtags} />
-        <Typography variant="subtitle1" color="textSecondary">
+        <Typography variant='subtitle1' color='textSecondary'>
           작성 / {article.reg_date}
         </Typography>
-        <Typography variant="subtitle1" color="textSecondary">
+        <Typography variant='subtitle1' color='textSecondary'>
           수정 / {article.update_date}
         </Typography>
         <Box sx={styles.viewer}>
@@ -91,7 +115,7 @@ const ArticleViewPage = ({
         <AsideNavBar
           router={router.asPath}
           sx={styles.asidebar}
-          highlighter={"green"}
+          highlighter={'green'}
           htmlEl={viewerRef}
           editortrue={false}
         ></AsideNavBar>
@@ -104,20 +128,21 @@ export default ArticleViewPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const blogInfo = await Request.Blog.getBlogInfoById(query.id);
-  const articles = await Request.Article.getArticleById(
-    query.articleId as string
-  );
+  // const articles = await Request.Article.getArticleById(
+  //   query.articleId as string
+  // );
   const comments = await Request.Comment.getCommentByArticleId(query.articleId);
-  const article = articles.data.results;
+  // const article = articles.data.results;
 
-  const errorCode =
-    article.length == 0 || blogInfo.data.length == 0 ? 404 : false;
+  // const errorCode =
+  //   article.length == 0 || blogInfo.data.length == 0 ? 404 : false;
+  const errorCode = blogInfo.data.length == 0 ? 404 : false;
   if (errorCode) {
     return {
       props: {
         errorCode,
         blog: {},
-        article: {},
+        // article: {},
         comments: {},
       },
     };
@@ -126,57 +151,57 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     props: {
       errorCode,
       blog: blogInfo.data[0],
-      article: article[0],
+      // article: article[0],
       comments: comments.data,
     },
   };
 };
 const styles = {
   articleCon: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    marginBottom: "20%",
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: '20%',
   },
   viewer: {
-    width: "100%",
+    width: '100%',
     // paddingLeft: "20px",
     // paddingRight: "20px",
   },
   emptyCon: {
-    width: "15%",
-    marginLeft: "0",
-    marginRight: "0",
+    width: '15%',
+    marginLeft: '0',
+    marginRight: '0',
     display: {
-      xs: "none",
-      md: "block",
+      xs: 'none',
+      md: 'block',
     },
   },
   innerCon: {
     width: {
-      xs: "100%",
-      md: "70%",
+      xs: '100%',
+      md: '70%',
     },
     margin: 0,
     padding: 0,
   },
   asideCon: {
-    width: "15%",
-    marginLeft: "0",
-    marginRight: "0",
+    width: '15%',
+    marginLeft: '0',
+    marginRight: '0',
     display: {
-      xs: "none",
-      md: "block",
+      xs: 'none',
+      md: 'block',
     },
   },
   asidebar: {
-    position: "sticky",
-    top: "20vh",
-    width: "100%",
-    marginLeft: "0",
-    marginRight: "0",
-    color: "secondary",
-    transition: "0.3s",
+    position: 'sticky',
+    top: '20vh',
+    width: '100%',
+    marginLeft: '0',
+    marginRight: '0',
+    color: 'secondary',
+    transition: '0.3s',
   },
 };
