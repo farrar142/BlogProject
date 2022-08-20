@@ -1,4 +1,8 @@
-import { ArticlesType, ArticleType } from "../types/blog/blogTags";
+import {
+  ArticlesType,
+  ArticleType,
+  ArticleViewType,
+} from "../types/blog/blogTags";
 import { AxiosResponse } from "axios";
 import client from "./client";
 import { Args, Paginated, PostArticleType, SimpleResponse } from "./types";
@@ -22,7 +26,7 @@ const Article = {
   },
   getArticleById: (
     articleId: Args
-  ): Promise<AxiosResponse<Paginated<ArticleType>>> => {
+  ): Promise<AxiosResponse<Paginated<ArticleViewType>>> => {
     return client.get(`/api/article/${articleId}`, {
       params: { context: true },
     });
