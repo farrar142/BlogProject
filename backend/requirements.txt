@@ -13,6 +13,7 @@ django-celery-beat
 celery==5.2.3
 redis
 gunicorn
+uwsgi
 
 django-ninja-jwt
 python-jose[cryptography]

@@ -10,7 +10,9 @@ services:
     build:
       dockerfile: deploy.dockerfile
       context: backend
-    container_name: ${BACK_NAME}_backend_${BUILD_NUMBER}
+    volumes:
+      - /docker_projects/nginx__1/data/blog_backend:/tmp/backend
+    container_name: ${BACK_NAME}_${BUILD_NUMBER}
     entrypoint: sh deploy.sh
     ports:
       - ${BACK_PORT}:8000
@@ -26,7 +28,7 @@ services:
     build:
       dockerfile: deploy.dockerfile
       context: frontend
-    container_name: ${FRONT_NAME}_frontend_${BUILD_NUMBER}
+    container_name: ${FRONT_NAME}_${BUILD_NUMBER}
     user: root
     entrypoint: sh deploy.sh
     ports:

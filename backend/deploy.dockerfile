@@ -10,7 +10,7 @@ RUN apk update \
     && apk add --no-cache mariadb-dev\
     && apk add jpeg-dev zlib-dev libjpeg
 COPY . .
-
+RUN mkdir /tmp/backend
 RUN pip3 install -r requirements.txt
 
 RUN apk del build-deps
