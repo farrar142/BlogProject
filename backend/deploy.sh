@@ -1,3 +1,3 @@
 python3 manage.py makemigrations
 python3 manage.py migrate
-gunicorn --bind 0.0.0.0:8000 base.wsgi
+uwsgi --env DJANGO_SETTINGS_MODULE=runthe_backend.settings --ini uwsgi.ini
